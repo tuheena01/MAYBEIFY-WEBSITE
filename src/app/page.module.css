@@ -213,32 +213,55 @@
 
 .book3D {
   position: relative;
-  perspective: 1000px;
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 
 .bookFrame {
   width: 100%;
-  aspect-ratio: 3/4;
+  aspect-ratio: 3/4.2; /* standard book ratio */
   background-size: cover;
   background-position: center;
-  box-shadow: 10px 10px 40px rgba(0,0,0,0.5);
-  transition: transform 0.6s var(--ease), box-shadow 0.6s var(--ease);
+  box-shadow: 5px 5px 25px rgba(0,0,0,0.4);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   transform-style: preserve-3d;
   position: relative;
-  border-radius: 2px;
+  border-radius: 3px 5px 5px 3px;
 }
 
 .book3D:hover .bookFrame {
-  transform: rotateY(-20deg) rotateX(10deg);
-  box-shadow: 30px 30px 60px rgba(0,0,0,0.7);
+  transform: rotateY(-22deg) rotateX(8deg) translateZ(10px);
+  box-shadow: 25px 25px 50px rgba(0,0,0,0.6);
 }
 
+/* Spine crease overlay */
 .bookFrame::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%);
+  background: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.0) 1.5%, rgba(255, 255, 255, 0.1) 2.5%, rgba(255, 255, 255, 0.0) 4%),
+    linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
   pointer-events: none;
+  z-index: 5;
+  border-radius: 3px 5px 5px 3px;
+}
+
+/* 3D Pages depth edge */
+.bookFrame::after {
+  content: '';
+  position: absolute;
+  top: 1%;
+  bottom: 1%;
+  right: -10px;
+  width: 10px;
+  background: #f4f0ea; /* cream color for vintage pages */
+  transform: rotateY(90deg);
+  transform-origin: left;
+  box-shadow: inset 1px 0 3px rgba(0,0,0,0.15);
+  background-image: repeating-linear-gradient(to bottom, transparent, transparent 1px, rgba(0,0,0,0.06) 1px, rgba(0,0,0,0.06) 2px);
+  z-index: -1;
+  border-radius: 0 2px 2px 0;
 }
 
 /* ═══════════════════════════════════════

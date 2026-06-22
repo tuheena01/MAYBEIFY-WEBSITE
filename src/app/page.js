@@ -123,9 +123,9 @@ export default function Home() {
   }, []);
 
   const books = [
-    { id: 1, title: 'The Echoes of Time', author: 'A. Montgomery', genre: 'Literary Fiction', image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800' },
-    { id: 2, title: 'Silent Whispers', author: 'Noor Jahan', genre: 'Contemporary', image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800' },
-    { id: 3, title: 'Beyond the Horizon', author: 'R. Mehta', genre: 'Narrative Non-Fiction', image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=800' },
+    { id: 1, title: 'Embers of Musings', author: 'Aranyaa Pattnaik', genre: 'Poetry & Musings', image: '/embers_of_musings.png' },
+    { id: 2, title: 'Art of Mind', author: 'Deborah M Tungnung', genre: 'Self-Help / Mindset', image: '/art_of_mind.png' },
+    { id: 3, title: 'The Fantastic Land of Never-Ending Stories', author: 'Roxana Negut', genre: 'Fantasy & Fairytale', image: '/fantastic_land.png' },
   ];
 
   return (
