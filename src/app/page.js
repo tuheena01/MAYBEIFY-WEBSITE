@@ -332,29 +332,6 @@ export default function Home() {
                 Nominate Now 🏆
               </Link>
             </motion.div>
-
-            {/* CARD 2: WRITERS VAULT */}
-            <motion.div 
-              className={styles.vaultCard}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <div className={styles.vaultCardGlow} style={{ background: 'radial-gradient(circle, rgba(201, 150, 58, 0.08) 0%, transparent 70%)' }}></div>
-              <div className={styles.vaultIconContainer} style={{ borderColor: 'rgba(201, 150, 58, 0.2)' }}>
-                <Gift size={36} className={styles.vaultIcon} strokeWidth={1.2} />
-              </div>
-              <span className={styles.eyebrow}>Exclusive Author Gift</span>
-              <h3>The Creator's <br /><em>Secret Vault</em></h3>
-              <p>
-                Unlock our exclusive toolkit designed to spark your writing flow. Inside, you'll find interactive writing prompts, ambient focus sounds, a story checklist, and a 50% discount voucher.
-              </p>
-              <Link href="/nominate" className={styles.vaultBtnSecondary}>
-                Unlock Vault ✦
-              </Link>
-            </motion.div>
           </div>
         </div>
       </section>

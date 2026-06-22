@@ -45,8 +45,8 @@ export default function Footer() {
           <span className={styles.colHead}>Contact</span>
           <span className={styles.colText}>Bhubaneswar, Orissa</span>
           <span className={styles.colText}>Est. 2022</span>
-          <a href="mailto:submissions@maybeify.com" className={styles.colLink}>
-            submissions@maybeify.com
+          <a href="mailto:contestmaybeify@gmail.com" className={styles.colLink}>
+            contestmaybeify@gmail.com
           </a>
         </div>
       </div>
