@@ -324,9 +324,9 @@ export default function Home() {
                 <Award size={36} className={styles.vaultIcon} strokeWidth={1.2} />
               </div>
               <span className={styles.eyebrow}>Now Accepting Entries</span>
-              <h3>The Literary <br /><em>Legacy Awards</em></h3>
+              <h3>Literary Icons <br /><em>2026</em></h3>
               <p>
-                Nominate your debut or in-progress manuscript for the 2026 Golden Scroll. Winners receive a ₹50,000 cash grant, 100% free publishing representation, and global distribution.
+                Nominate your book or manuscript for the Literary Icons 2026 recognition program. Selected authors receive a custom book-shaped trophy, wooden framed certificate, appreciation letter, digital magazine feature, podcast release, author interview, and social media promotions.
               </p>
               <Link href="/nominate" className={styles.vaultBtnPrimary}>
                 Nominate Now 🏆
