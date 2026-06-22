@@ -1,0 +1,592 @@
+.page {
+  background: var(--navy);
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════
+   HERO: "For Writers Destined To Be Remembered"
+═══════════════════════════════════════ */
+.hero {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  padding: 0 5rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--navy);
+  gap: 4rem;
+}
+
+/* Floating Grid Animation */
+.floatingGrid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(201,160,80,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,160,80,0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+  z-index: 1;
+  animation: gridFloat 20s linear infinite;
+}
+
+@keyframes gridFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(80px); }
+}
+
+/* Mouse Follow Light Gradient */
+.cursorLight {
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(201,160,80,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease-out;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 5;
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+  display: block;
+}
+
+.heroTitle {
+  font-size: clamp(3.5rem, 6vw, 7.5rem);
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.1;
+  margin-bottom: 2rem;
+}
+
+.heroTitle em {
+  font-style: italic;
+  color: var(--gold);
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-lt) 50%, var(--gold) 100%);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerMove 6s linear infinite;
+}
+
+.heroLine {
+  height: 1px;
+  background: var(--gold);
+  margin-bottom: 3rem;
+}
+
+@keyframes shimmerMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.heroDesc {
+  font-size: 1rem;
+  color: var(--text2);
+  line-height: 1.8;
+  max-width: 480px;
+  margin-bottom: 4rem;
+  font-weight: 300;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.btnPrimary {
+  padding: 16px 40px;
+  background: var(--gold);
+  color: var(--navy);
+  border: 1px solid var(--gold);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s var(--ease);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btnPrimary:hover {
+  background: transparent;
+  color: var(--gold);
+  box-shadow: 0 0 30px var(--gold-glow);
+}
+
+.btnGhost {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text2);
+  text-decoration: none;
+  border: 1px solid var(--navy-border);
+  padding: 14px 30px;
+  transition: all 0.3s ease;
+}
+
+.btnGhost:hover {
+  color: var(--text);
+  border-color: var(--text);
+  background: rgba(255,255,255,0.05);
+}
+
+/* ── Hero Metrics Panel ── */
+.heroMetrics {
+  position: relative;
+  z-index: 5;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--navy-border);
+  border: 1px solid var(--navy-border);
+  gap: 1px;
+}
+
+.metricItem {
+  background: var(--navy2);
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.metricItem:hover {
+  background: var(--navy3);
+}
+
+.metricItem:hover .metricValue {
+  color: var(--text);
+  transform: translateY(-5px);
+}
+
+.metricValue {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-style: italic;
+  color: var(--gold);
+  line-height: 1;
+  transition: all 0.4s var(--ease);
+}
+
+.metricLabel {
+  font-size: 0.56rem;
+  letter-spacing: 0.25em;
+  color: var(--text3);
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* ═══════════════════════════════════════
+   SHOWCASE WALL: 3D Floating Books
+═══════════════════════════════════════ */
+.showcaseSection {
+  padding: 12rem 0;
+  background: var(--navy);
+  position: relative;
+}
+
+.showcaseGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4rem;
+}
+
+.book3D {
+  position: relative;
+  perspective: 1000px;
+}
+
+.bookFrame {
+  width: 100%;
+  aspect-ratio: 3/4;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 10px 10px 40px rgba(0,0,0,0.5);
+  transition: transform 0.6s var(--ease), box-shadow 0.6s var(--ease);
+  transform-style: preserve-3d;
+  position: relative;
+  border-radius: 2px;
+}
+
+.book3D:hover .bookFrame {
+  transform: rotateY(-20deg) rotateX(10deg);
+  box-shadow: 30px 30px 60px rgba(0,0,0,0.7);
+}
+
+.bookFrame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════
+   THE PROCESS: Luxury Timeline
+═══════════════════════════════════════ */
+.processSection {
+  padding: 12rem 0;
+  background: var(--navy2);
+}
+
+.processTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  text-align: center;
+  margin-bottom: 8rem;
+}
+
+.processTitle em { font-style: italic; color: var(--gold); }
+
+.processGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+}
+
+.processStep {
+  position: relative;
+  padding-top: 3rem;
+}
+
+.stepNum {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.stepLabel {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: block;
+  letter-spacing: 0.05em;
+}
+
+.stepDesc {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════
+   THE CUSTODIANS: Leadership
+   ═══════════════════════════════════════ */
+.custodiansSection {
+  padding: 100px 0;
+  background: rgba(255, 255, 255, 0.01);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.custodiansHeader {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.custodiansGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.custodianCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  padding: 50px;
+  border-radius: 40px;
+  display: flex;
+  gap: 30px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.custodianCard:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(212, 175, 55, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+}
+
+.custodianIcon {
+  width: 64px;
+  height: 64px;
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.custodianContent h3 {
+  font-size: 2rem;
+  font-family: var(--font-serif);
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.custodianContent p {
+  color: #888;
+  line-height: 1.7;
+  font-size: 1.05rem;
+  margin-bottom: 25px;
+}
+
+.signatureLine {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #d4af37;
+  border-top: 1px solid rgba(212, 175, 55, 0.1);
+  padding-top: 15px;
+  display: inline-block;
+}
+
+/* ═══════════════════════════════════════
+   AUTHORS CAROUSEL
+═══════════════════════════════════════ */
+.authorsSection {
+  padding: 12rem 0;
+}
+
+.authorCard {
+  background: var(--navy2);
+  border: 1px solid var(--navy-border);
+  padding: 5rem;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.authorImg {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  filter: grayscale(1);
+  transition: filter 0.6s ease;
+}
+
+.authorCard:hover .authorImg {
+  filter: grayscale(0);
+}
+
+.quote {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  line-height: 1.3;
+  font-style: italic;
+  margin-bottom: 2rem;
+  color: var(--text);
+}
+
+.authorName {
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* ═══════════════════════════════════════
+   FINAL CTA
+═══════════════════════════════════════ */
+.ctaSection {
+  padding: 15rem 0;
+  text-align: center;
+  background: radial-gradient(circle at center, var(--navy3) 0%, var(--navy) 100%);
+}
+
+.ctaTitle {
+  font-size: clamp(3rem, 7vw, 7rem);
+  margin-bottom: 4rem;
+}
+
+.ctaTitle em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 1200px) {
+  .hero { grid-template-columns: 1fr; padding: 5rem 2rem; padding-top: 100px; }
+  .heroMetrics { max-width: 600px; }
+}
+@media (max-width: 1024px) {
+  .processGrid { grid-template-columns: repeat(2, 1fr); }
+  .authorCard { grid-template-columns: 1fr; gap: 2rem; padding: 2rem; }
+  .showcaseGrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .metricsGrid { grid-template-columns: 1fr; }
+  .heroActions { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+}
+
+/* ═══════════════════════════════════════
+   AWARDS & CREATOR VAULT
+═══════════════════════════════════════ */
+.interactiveVaultSection {
+  padding: 8rem 0;
+  background: var(--navy);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.vaultGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.vaultCard {
+  position: relative;
+  background: var(--navy2);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  padding: 4.5rem 3.5rem;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: all 0.4s var(--ease);
+}
+
+.vaultCard:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(201, 150, 58, 0.05);
+}
+
+.vaultCardGlow {
+  position: absolute;
+  top: -20%; right: -20%;
+  width: 60%; height: 60%;
+  background: radial-gradient(circle, rgba(201, 150, 58, 0.12) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.vaultIconContainer {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  border: 1px solid rgba(201, 150, 58, 0.25);
+  background: rgba(201, 150, 58, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  color: var(--gold);
+}
+
+.vaultIcon {
+  color: var(--gold);
+  transition: transform 0.4s var(--ease);
+}
+
+.vaultCard:hover .vaultIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.vaultCard h3 {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+}
+
+.vaultCard h3 em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.vaultCard p {
+  font-size: 0.95rem;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 3rem;
+  min-height: 80px;
+}
+
+.vaultBtnPrimary {
+  padding: 14px 34px;
+  background: var(--gold);
+  color: #000;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.4s var(--ease);
+}
+
+.vaultBtnPrimary:hover {
+  background: var(--gold-lt);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(201, 160, 80, 0.2);
+}
+
+.vaultBtnSecondary {
+  padding: 14px 34px;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.4s var(--ease);
+}
+
+.vaultBtnSecondary:hover {
+  background: var(--gold);
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(201, 160, 80, 0.15);
+}
+
+@media (max-width: 900px) {
+  .vaultGrid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .vaultCard {
+    padding: 3.5rem 2.5rem;
+  }
+}
+

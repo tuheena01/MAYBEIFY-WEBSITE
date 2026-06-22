@@ -1,0 +1,99 @@
+.footer {
+  background: var(--navy);
+  border-top: 1px solid var(--navy-border);
+}
+
+/* ── Footer body (4-col grid) ── */
+.body {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 4rem;
+  padding: 5rem;
+  border-bottom: 1px solid var(--navy-border);
+}
+
+/* Brand */
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.brandName {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  letter-spacing: 0.22em;
+  color: var(--text);
+  font-weight: 500;
+}
+.brandSub {
+  font-size: 0.5rem;
+  letter-spacing: 0.42em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.brandDesc {
+  font-size: 0.82rem;
+  color: var(--text2);
+  line-height: 1.85;
+  max-width: 280px;
+}
+
+/* Columns */
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.colHead {
+  font-size: 0.6rem;
+  letter-spacing: 0.32em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.colLink {
+  font-size: 0.8rem;
+  color: var(--text2);
+  text-decoration: none;
+  transition: color 0.25s ease;
+  letter-spacing: 0.02em;
+}
+.colLink:hover { color: var(--text); }
+.colBtn {
+  font-size: 0.8rem;
+  color: var(--text2);
+  background: none; border: none; cursor: pointer;
+  padding: 0; text-align: left;
+  letter-spacing: 0.02em;
+  transition: color 0.25s ease;
+  font-family: var(--font-sans); font-weight: 300;
+}
+.colBtn:hover { color: var(--gold); }
+.colText {
+  font-size: 0.8rem;
+  color: var(--text2);
+  letter-spacing: 0.02em;
+}
+
+/* ── Base bar ── */
+.base {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 5rem;
+}
+.copy {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+}
+
+@media (max-width: 1024px) {
+  .body { grid-template-columns: 1fr 1fr; gap: 3rem; padding: 3rem 2rem; }
+  .base { padding: 1.5rem 2rem; }
+}
+@media (max-width: 640px) {
+  .body { grid-template-columns: 1fr; gap: 2.5rem; padding: 2.5rem 1.5rem; }
+  .base { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.2rem 1.5rem; }
+}

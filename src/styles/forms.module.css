@@ -1,0 +1,75 @@
+.formContainer {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 3rem;
+}
+
+.formContainer h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.formContainer p {
+  color: #888;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.submitBtn {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.success {
+  background: rgba(0, 230, 118, 0.1);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.error {
+  background: rgba(255, 74, 74, 0.1);
+  color: var(--error);
+  border: 1px solid var(--error);
+}

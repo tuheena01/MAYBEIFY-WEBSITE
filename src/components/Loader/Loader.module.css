@@ -1,0 +1,70 @@
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  animation: loaderIn 0.8s var(--ease) both;
+}
+@keyframes loaderIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.logoMark {
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  animation: goldPulse 1.5s ease-in-out infinite;
+}
+@keyframes goldPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.15); }
+}
+
+.logoText {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  letter-spacing: 0.32em;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.logoSub {
+  font-size: 0.56rem;
+  letter-spacing: 0.44em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+}
+
+.bar {
+  width: 120px;
+  height: 1px;
+  background: var(--navy-border);
+  overflow: hidden;
+}
+.barFill {
+  height: 100%;
+  background: var(--gold);
+  animation: barLoad 2s var(--ease) forwards;
+  width: 0;
+}
+@keyframes barLoad {
+  0%   { width: 0; }
+  100% { width: 100%; }
+}

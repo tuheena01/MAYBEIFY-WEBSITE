@@ -1,0 +1,123 @@
+.container {
+  max-width: 1200px;
+  margin: 6rem auto;
+  padding: 0 2rem;
+}
+
+.sub {
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  margin-bottom: 3rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background: var(--navy2);
+  border: 1px solid var(--navy-border);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cardHeader {
+  border-bottom: 1px solid var(--navy-border);
+  padding-bottom: 1.5rem;
+}
+
+.date {
+  font-size: 0.6rem;
+  color: var(--text3);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.genre {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+
+.authorInfo {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.synopsis {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.approveBtn {
+  background: var(--gold);
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex: 1;
+}
+
+.rejectBtn {
+  background: transparent;
+  color: var(--text3);
+  border: 1px solid var(--navy-border);
+  padding: 10px 20px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.approveBtn:hover { background: var(--text); transform: translateY(-2px); }
+
+.sectionTitle {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  color: var(--text2);
+  border-bottom: 1px solid var(--surface-border);
+  padding-bottom: 1rem;
+}
+
+.empty {
+  color: var(--text3);
+  font-style: italic;
+}
+
+.rejectBtn:hover { border-color: #ff4444; color: #ff4444; }
+
+.discountBadge {
+  display: inline-block;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid rgba(201, 160, 80, 0.3);
+  padding: 4px 10px;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(201, 160, 80, 0.05);
+}

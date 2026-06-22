@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  name          String
+  password      String       
+  role          String       @default("AUTHOR") // "AUTHOR", "ADMIN", "AMBASSADOR", "PROJECT_HEAD", "COMPILER"
+  referralCode  String       @unique
+  referredBy    String?
+  isActive      Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  
+  projectHeadId String?      // Link Compiler to Project Head
+  
+  manuscripts   Manuscript[]
+  royalties     Royalty[]
+  messagesSent  Message[]    @relation("MessagesSent")
+  messagesRecv  Message[]    @relation("MessagesReceived")
+  enrollments   ChallengeEnrollment[]
+}
+
+model Manuscript {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   
+  status      String   @default("PENDING") // "PENDING", "ACCEPTED", "REJECTED"
+  progress    Int      @default(0)
+  packageName String?
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  compilerId  String?
+  projectHeadId String?
+  createdAt   DateTime @default(now())
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  rating    Int      @default(5)
+  createdAt DateTime @default(now())
+}
+
+model Royalty {
+  id        String   @id @default(uuid())
+  amount    Float
+  month     String
+  status    String   @default("PAID") // "PAID", "PENDING"
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  senderId   String
+  sender     User     @relation("MessagesSent", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User     @relation("MessagesReceived", fields: [receiverId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+
+model Merchandise {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  image       String
+  createdAt   DateTime @default(now())
+}
+
+model ChallengeEnrollment {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  startDate   DateTime @default(now())
+  paid        Boolean  @default(false)
+  paymentId   String?  // Razorpay Payment ID
+  orderId     String?  // Razorpay Order ID
+  
+  submissions ChallengeSubmission[]
+}
+
+model ChallengeSubmission {
+  id           String   @id @default(uuid())
+  enrollmentId String
+  enrollment   ChallengeEnrollment @relation(fields: [enrollmentId], references: [id])
+  dayNumber    Int
+  content      String
+  submittedAt  DateTime @default(now())
+}
+
+model Application {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  title     String
+  genre     String
+  synopsis  String
+  discount  String?  // Saved discount code or percentage
+  status    String   @default("PENDING") // "PENDING", "APPROVED", "REJECTED"
+  createdAt DateTime @default(now())
+}
+
+model Nomination {
+  id               String   @id @default(uuid())
+  name             String
+  email            String
+  title            String
+  genre            String
+  yearOfPublishing String
+  instagram        String?  // Instagram ID
+  whatsapp         String   // WhatsApp Number
+  phone            String   // Calling Number
+  reason           String   // Why they should win
+  synopsis         String   // About the manuscript
+  status           String   @default("PENDING")
+  createdAt        DateTime @default(now())
+}
