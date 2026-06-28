@@ -26,24 +26,24 @@
 }
 
 [data-theme='light'] {
-  /* ── Core Palette: Elegant Ivory & Cream (Light Theme) ── */
-  --navy:          #FAF8F5;   /* Warm cream background */
+  /* ── Core Palette: Elegant Pastel Sage Green (Light Theme) ── */
+  --navy:          #F0F4EF;   /* Soft pastel sage background */
   --navy2:         #FFFFFF;   /* Clean white cards */
-  --navy3:         #F3EEE4;   /* Warm gray hover */
-  --navy-border:   rgba(8, 12, 20, 0.08);
-  --navy-border2:  rgba(8, 12, 20, 0.04);
-  --nav-bg:        rgba(250, 248, 245, 0.9);
+  --navy3:         #E3EAE0;   /* Slightly deeper sage for hover */
+  --navy-border:   rgba(22, 38, 28, 0.08);
+  --navy-border2:  rgba(22, 38, 28, 0.04);
+  --nav-bg:        rgba(240, 244, 239, 0.9);
 
   /* ── Gold Accent ── */
-  --gold:          #A47A32;   /* Deeper gold for readability on light background */
-  --gold-lt:       #BD903C;
-  --gold-dim:      rgba(164,122,50,0.08);
-  --gold-glow:     rgba(164,122,50,0.2);
+  --gold:          #946E2A;   /* Deeper bronze/gold for luxury contrast on sage */
+  --gold-lt:       #A67C31;
+  --gold-dim:      rgba(148,110,42,0.08);
+  --gold-glow:     rgba(148,110,42,0.18);
 
   /* ── Typography ── */
-  --text:          #161A23;   /* Deep slate-black text for perfect readability */
-  --text2:         rgba(22, 26, 35, 0.7);
-  --text3:         rgba(22, 26, 35, 0.45);
+  --text:          #16251D;   /* Very deep forest green for optimal readability */
+  --text2:         rgba(22, 37, 29, 0.7);
+  --text3:         rgba(22, 37, 29, 0.45);
 }
 
 *, *::before, *::after { 
