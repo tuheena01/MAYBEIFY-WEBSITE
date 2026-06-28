@@ -172,8 +172,32 @@
 
 @media (max-width: 1024px) { .inner { padding: 0 2rem; gap: 1rem; } }
 @media (max-width: 768px) {
-  .left, .navArrows, .navArrowsRight { display: none; }
-  .inner { justify-content: center; }
-  .logo { position: static; transform: none; }
-  .logo:hover { transform: scale(1.02); }
+  .left {
+    display: flex !important;
+    gap: 0.5rem;
+    flex: 1;
+  }
+  .left a {
+    display: none !important;
+  }
+  
+  .right {
+    display: flex !important;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    flex: 1;
+  }
+  .right a {
+    display: none !important;
+  }
+
+  .authorBtn {
+    padding: 8px 16px;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+  }
+
+  .navArrows, .navArrowsRight { display: none; }
+  .inner { padding: 0 1rem; }
+  .logo { margin: 0 1rem; }
 }
