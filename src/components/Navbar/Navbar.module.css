@@ -21,11 +21,12 @@
   height: 90px;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 3rem;
+  padding: 0 4.5rem;
+  column-gap: 2rem;
 }
 
-.left { display: flex; align-items: center; gap: 3.5rem; }
-.right { display: flex; align-items: center; gap: 3rem; justify-content: flex-end; }
+.left { display: flex; align-items: center; gap: 4.5rem; }
+.right { display: flex; align-items: center; gap: 4rem; justify-content: flex-end; }
 
 /* Logo */
 .logo {
