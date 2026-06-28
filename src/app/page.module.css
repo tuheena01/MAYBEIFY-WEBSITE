@@ -395,12 +395,12 @@
    AUTHORS / REVIEWS SECTION
 ═══════════════════════════════════════ */
 .authorsSection {
-  padding: 12rem 0;
+  padding: 6rem 0;
 }
 
 .reviewsHeader {
   text-align: center;
-  margin-bottom: 6rem;
+  margin-bottom: 3rem;
 }
 
 .reviewsEyebrow {
@@ -425,16 +425,16 @@
 .reviewsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  gap: 1.5rem;
 }
 
 .authorCard {
   background: var(--navy2);
   border: 1px solid var(--navy-border);
-  padding: 4rem;
+  padding: 2rem 2.5rem;
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 3.5rem;
+  grid-template-columns: 110px 1fr;
+  gap: 2rem;
   align-items: flex-start;
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
   position: relative;
@@ -465,12 +465,13 @@
 
 .authorImg {
   width: 100%;
-  aspect-ratio: 3/4;
+  aspect-ratio: 1/1;
   object-fit: cover;
-  object-position: top;
+  object-position: top center;
   filter: grayscale(0.3);
   transition: filter 0.6s ease;
   display: block;
+  border-radius: 2px;
 }
 
 .authorCard:hover .authorImg {
@@ -489,24 +490,24 @@
 .authorCardContent {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.8rem;
 }
 
 .reviewStars {
   color: var(--gold);
-  font-size: 1rem;
-  letter-spacing: 0.15em;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
 }
 
 .quote {
   font-family: var(--font-serif);
-  font-size: 1.05rem;
-  line-height: 1.85;
+  font-size: 0.85rem;
+  line-height: 1.7;
   font-style: italic;
   color: var(--text2);
   margin: 0;
   border-left: 2px solid var(--gold-dim);
-  padding-left: 1.5rem;
+  padding-left: 1rem;
 }
 
 .authorName {
