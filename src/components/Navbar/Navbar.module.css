@@ -19,13 +19,13 @@
   display: flex;
   align-items: center;
   height: 90px;
-  max-width: 1600px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 4.5rem;
+  padding: 0 3rem;
 }
 
-.left { display: flex; align-items: center; gap: 3rem; flex: 1; }
-.right { display: flex; align-items: center; gap: 2.5rem; justify-content: flex-end; flex: 1; }
+.left { display: flex; align-items: center; gap: 2rem; flex: 1; }
+.right { display: flex; align-items: center; gap: 1.75rem; justify-content: flex-end; flex: 1; }
 
 /* Logo — centred by flex:1 siblings with guaranteed spacing */
 .logo {
@@ -33,7 +33,7 @@
   text-decoration: none; gap: 4px; transition: transform 0.4s var(--ease);
   flex-shrink: 0;
   white-space: nowrap;
-  margin: 0 4.5rem;
+  margin: 0 2.5rem;
 }
 .logo:hover { transform: scale(1.02); }
 
@@ -114,7 +114,7 @@
 
 .navArrows {
   position: absolute;
-  left: 1.5rem;
+  left: 0.75rem;
   display: flex;
   align-items: center;
   z-index: 10;
@@ -122,7 +122,7 @@
 
 .navArrowsRight {
   position: absolute;
-  right: 1.5rem;
+  right: 0.75rem;
   display: flex;
   align-items: center;
   z-index: 10;
