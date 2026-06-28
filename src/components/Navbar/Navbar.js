@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useModal } from '@/context/ModalContext';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 import styles from './Navbar.module.css';
 
 const PAGES = [
@@ -19,6 +19,7 @@ export default function Navbar() {
   const { setSubmitModalOpen } = useModal();
   const [scrolled, setScrolled] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [theme, setTheme] = useState('dark');
   const audioRef = useRef(null);
   const pathname = usePathname();
 
@@ -27,6 +28,19 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('maybeify_theme') || 'dark';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('maybeify_theme', nextTheme);
+  };
 
   const toggleSound = () => {
     if (audioRef.current) {
@@ -62,6 +76,9 @@ export default function Navbar() {
         <div className={styles.left}>
           <button className={styles.soundToggle} onClick={toggleSound} title={isMuted ? "Play Library Ambience" : "Mute"}>
             {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
+          <button className={styles.themeToggle} onClick={toggleTheme} title={theme === 'dark' ? "Switch to Light Theme" : "Switch to Dark Theme"}>
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <Link href="/challenge" className={styles.challengeLink}>
             ✦ 21-Day Challenge

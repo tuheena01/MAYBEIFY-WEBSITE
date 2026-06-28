@@ -8,7 +8,7 @@
 }
 
 .scrolled {
-  background: rgba(8, 12, 20, 0.9);
+  background: var(--nav-bg);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border-bottom-color: var(--navy-border);
@@ -128,10 +128,10 @@
   z-index: 10;
 }
 
-.soundToggle {
+.soundToggle, .themeToggle {
   background: transparent;
   border: none;
-  color: #888;
+  color: var(--text2);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -139,13 +139,15 @@
   padding: 8px;
   border-radius: 50%;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--navy-border);
+  outline: none;
 }
 
-.soundToggle:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border-color: rgba(212, 175, 55, 0.3);
+.soundToggle:hover, .themeToggle:hover {
+  background: var(--navy3);
+  color: var(--text);
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
 }
 
 .navArrowsRight { justify-content: flex-end; }

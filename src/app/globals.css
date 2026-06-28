@@ -1,12 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,600&family=Inter:wght@100;200;300;400;500;600&display=swap');
 
 :root {
-  /* ── Core Palette: Deep Prussian Navy ── */
+  /* ── Core Palette: Deep Prussian Navy (Dark Theme) ── */
   --navy:          #080C14;   /* Darker, richer navy */
   --navy2:         #0C121D;   /* Card surfaces */
   --navy3:         #121B2B;   /* Hover surfaces */
   --navy-border:   rgba(255,255,255,0.08);
   --navy-border2:  rgba(255,255,255,0.04);
+  --nav-bg:        rgba(8, 12, 20, 0.9);
 
   /* ── Gold Accent ── */
   --gold:          #C9A050;
@@ -24,6 +25,27 @@
   --ease:          cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+[data-theme='light'] {
+  /* ── Core Palette: Elegant Ivory & Cream (Light Theme) ── */
+  --navy:          #FAF8F5;   /* Warm cream background */
+  --navy2:         #FFFFFF;   /* Clean white cards */
+  --navy3:         #F3EEE4;   /* Warm gray hover */
+  --navy-border:   rgba(8, 12, 20, 0.08);
+  --navy-border2:  rgba(8, 12, 20, 0.04);
+  --nav-bg:        rgba(250, 248, 245, 0.9);
+
+  /* ── Gold Accent ── */
+  --gold:          #A47A32;   /* Deeper gold for readability on light background */
+  --gold-lt:       #BD903C;
+  --gold-dim:      rgba(164,122,50,0.08);
+  --gold-glow:     rgba(164,122,50,0.2);
+
+  /* ── Typography ── */
+  --text:          #161A23;   /* Deep slate-black text for perfect readability */
+  --text2:         rgba(22, 26, 35, 0.7);
+  --text3:         rgba(22, 26, 35, 0.45);
+}
+
 *, *::before, *::after { 
   box-sizing: border-box; 
   margin: 0; 
@@ -33,6 +55,7 @@
 html { 
   scroll-behavior: smooth; 
   background: var(--navy);
+  transition: background-color 0.3s ease;
 }
 
 body {
@@ -43,6 +66,12 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Ensure smooth transition for all key sections, cards, text, and inputs */
+body, header, nav, footer, section, div, p, span, h1, h2, h3, h4, a, button, input, textarea {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 h1, h2, h3, h4 {
