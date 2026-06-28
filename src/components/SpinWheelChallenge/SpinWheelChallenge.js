@@ -22,13 +22,13 @@ export default function SpinWheelChallenge() {
 
   const sectors = [
     { label: '10%', color: '#C9A050' },   // Gold
-    { label: '50%', color: '#0C121D' },   // Navy
-    { label: '15%', color: '#E2B65E' },   // Light Gold
-    { label: '75%', color: '#162235' },   // Medium Navy
-    { label: '25%', color: '#C9A050' },   // Gold
-    { label: '90%', color: '#0C121D' },   // Navy
-    { label: '100%', color: '#E2B65E' },  // Light Gold
-    { label: '10%', color: '#162235' }    // Medium Navy
+    { label: '5%', color: '#0C121D' },    // Navy
+    { label: '10%', color: '#E2B65E' },   // Light Gold
+    { label: '5%', color: '#162235' },    // Medium Navy
+    { label: '10%', color: '#C9A050' },   // Gold
+    { label: '5%', color: '#0C121D' },    // Navy
+    { label: '10%', color: '#E2B65E' },   // Light Gold
+    { label: '5%', color: '#162235' }     // Medium Navy
   ];
 
   // Auto-open on landing after 2.5 seconds
@@ -49,8 +49,8 @@ export default function SpinWheelChallenge() {
     setSpinState('spinning');
     setPointerActive(true);
 
-    // RIGGING: Only land on 10% (index 0, 7), 15% (index 2), or 25% (index 4)
-    const allowedIndexes = [0, 2, 4, 7];
+    // RIGGING: Only land on 5% or 10%
+    const allowedIndexes = [0, 1, 2, 3, 4, 5, 6, 7];
     const selectedIndex = allowedIndexes[Math.floor(Math.random() * allowedIndexes.length)];
     const prize = sectors[selectedIndex].label;
     setWonDiscount(prize);
@@ -134,7 +134,7 @@ export default function SpinWheelChallenge() {
                     <h2 className={styles.title}>The <em>Legacy</em> Wheel</h2>
                     <p className={styles.description}>
                       Every manuscript published by Maybeify is crafted to be timeless. 
-                      Spin our wheel to unlock <span className={styles.descBold}>elite author grants & publishing scholarships</span> of up to 100%.
+                      Spin our wheel to unlock <span className={styles.descBold}>elite author grants & publishing scholarships</span> of up to 10%.
                     </p>
                     <p className={styles.description} style={{ fontSize: '0.8rem', opacity: 0.6 }}>
                       *One spin per manuscript submission. Results are secure and privately reviewed by our Acquisitions Board.
