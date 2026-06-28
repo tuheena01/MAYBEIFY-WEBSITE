@@ -336,8 +336,8 @@
 }
 
 .custodianCard {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(212, 175, 55, 0.1);
+  background: var(--navy2);
+  border: 1px solid var(--navy-border);
   padding: 50px;
   border-radius: 40px;
   display: flex;
@@ -348,34 +348,34 @@
 }
 
 .custodianCard:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(212, 175, 55, 0.3);
+  background: var(--navy3);
+  border-color: var(--gold);
   transform: translateY(-5px);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.15);
 }
 
 .custodianIcon {
   width: 64px;
   height: 64px;
-  background: rgba(212, 175, 55, 0.1);
-  color: #d4af37;
+  background: var(--gold-dim);
+  color: var(--gold);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid var(--gold-dim);
 }
 
 .custodianContent h3 {
   font-size: 2rem;
   font-family: var(--font-serif);
   margin-bottom: 15px;
-  color: #fff;
+  color: var(--text);
 }
 
 .custodianContent p {
-  color: #888;
+  color: var(--text2);
   line-height: 1.7;
   font-size: 1.05rem;
   margin-bottom: 25px;
@@ -385,8 +385,8 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #d4af37;
-  border-top: 1px solid rgba(212, 175, 55, 0.1);
+  color: var(--gold);
+  border-top: 1px solid var(--navy-border);
   padding-top: 15px;
   display: inline-block;
 }
