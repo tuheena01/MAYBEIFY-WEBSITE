@@ -23,6 +23,12 @@
   --font-sans:     'Inter', sans-serif;
   --font-serif:    'Cormorant Garamond', serif;
   --ease:          cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Fallback Maps ── */
+  --background:    var(--navy);
+  --foreground:    var(--text);
+  --accent:        var(--gold);
+  --text-muted:    var(--text2);
 }
 
 [data-theme='light'] {
@@ -44,6 +50,12 @@
   --text:          #0A120E;   /* Deep solid charcoal green for headers/active text */
   --text2:         #283C32;   /* Solid forest slate for paragraphs/secondary text */
   --text3:         #5A6F65;   /* Solid muted slate green for labels and place-holders */
+
+  /* ── Fallback Maps ── */
+  --background:    var(--navy);
+  --foreground:    var(--text);
+  --accent:        var(--gold);
+  --text-muted:    var(--text2);
 }
 
 *, *::before, *::after { 
