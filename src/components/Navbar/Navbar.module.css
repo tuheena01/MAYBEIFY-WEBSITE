@@ -15,25 +15,30 @@
 }
 
 .inner {
-  display: grid;
-  grid-template-columns: 40px 1.5fr auto 1.5fr 40px;
+  position: relative;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   height: 90px;
   max-width: 1600px;
   margin: 0 auto;
   padding: 0 4.5rem;
-  column-gap: 2rem;
 }
 
 .left { display: flex; align-items: center; gap: 4.5rem; }
 .right { display: flex; align-items: center; gap: 4rem; justify-content: flex-end; }
 
-/* Logo */
+/* Logo — always perfectly centred */
 .logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex; flex-direction: column; align-items: center;
   text-decoration: none; gap: 4px; transition: transform 0.4s var(--ease);
+  pointer-events: auto;
+  z-index: 1;
 }
-.logo:hover { transform: scale(1.02); }
+.logo:hover { transform: translateX(-50%) scale(1.02); }
 
 .logoText {
   font-family: var(--font-serif);
@@ -158,6 +163,7 @@
 @media (max-width: 1024px) { .inner { padding: 0 2rem; } }
 @media (max-width: 768px) {
   .left, .navArrows, .navArrowsRight { display: none; }
-  .inner { grid-template-columns: auto 1fr; }
-  .logo { align-items: flex-start; }
+  .inner { justify-content: center; }
+  .logo { position: static; transform: none; }
+  .logo:hover { transform: scale(1.02); }
 }
