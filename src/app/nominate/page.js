@@ -160,163 +160,188 @@ export default function NominatePage() {
                 <div className={styles.perksGrid}>
 
                   {/* 01 — Wooden Framed Certificate */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>01</span>
-                    <div className={styles.perkIconContainer}>
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="3" width="18" height="14" rx="2" />
-                        <path d="M8 21h8M12 17v4" />
-                        <path d="M7 8h.01M12 8h.01M17 8h.01" />
-                        <path d="M7 11h10" />
-                      </svg>
+                  <div className={`${styles.perkCard} ${styles.perkCard01}`}>
+                    <span className={styles.perkAccentNum}>01</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h.01M12 8h.01M17 8h.01"/><path d="M7 11h10"/>
+                        </svg>
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 01</p>
+                      <h4 className={styles.perkCardTitle}>Wooden Framed Certificate</h4>
+                      <p className={styles.perkCardDesc}>A premium wooden-framed recognition certificate hand-delivered to your doorstep.</p>
                     </div>
-                    <h4>Wooden Framed Certificate</h4>
-                    <p>A premium wooden-framed recognition certificate hand-delivered to your doorstep.</p>
                   </div>
 
                   {/* 02 — Appreciation Letter */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>02</span>
-                    <div className={styles.perkIconContainer}>
-                      <Mail size={28} />
+                  <div className={`${styles.perkCard} ${styles.perkCard02}`}>
+                    <span className={styles.perkAccentNum}>02</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <Mail size={26} />
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 02</p>
+                      <h4 className={styles.perkCardTitle}>Appreciation Letter</h4>
+                      <p className={styles.perkCardDesc}>An official, signed appreciation letter from the Maybeify editorial review board.</p>
                     </div>
-                    <h4>Appreciation Letter</h4>
-                    <p>An official, signed appreciation letter from the Maybeify editorial review board.</p>
                   </div>
 
                   {/* 03 — Medal */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>03</span>
-                    <div className={styles.perkIconContainer}>
-                      <Award size={28} />
+                  <div className={`${styles.perkCard} ${styles.perkCard03}`}>
+                    <span className={styles.perkAccentNum}>03</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <Award size={26} />
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 03</p>
+                      <h4 className={styles.perkCardTitle}>Medal</h4>
+                      <p className={styles.perkCardDesc}>A bespoke literary icon medal recognising your outstanding contribution to literature.</p>
                     </div>
-                    <h4>Medal</h4>
-                    <p>A bespoke literary icon medal recognising your outstanding contribution to literature.</p>
                   </div>
 
                   {/* 04 — Podcast Feature on Spotify */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>04</span>
-                    <div className={styles.perkIconContainer}>
-                      {/* Spotify logo */}
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 0 1-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 0 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.857zm1.223-2.722a.78.78 0 0 1-1.072.257C14.1 12.257 10.539 11.82 7.2 12.78a.78.78 0 0 1-.428-1.498c3.795-1.086 7.795-.558 10.782 1.348a.78.78 0 0 1 .255 1.072zm.105-2.835C14.692 9.178 9.375 9 6.297 9.86a.937.937 0 1 1-.543-1.793c3.541-.977 9.44-.787 13.167 1.43a.937.937 0 1 1-.978 1.614l-.029-.234z"/>
-                      </svg>
+                  <div className={`${styles.perkCard} ${styles.perkCard04}`}>
+                    <span className={styles.perkAccentNum}>04</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                          <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 0 1-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 0 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.857zm1.223-2.722a.78.78 0 0 1-1.072.257C14.1 12.257 10.539 11.82 7.2 12.78a.78.78 0 0 1-.428-1.498c3.795-1.086 7.795-.558 10.782 1.348a.78.78 0 0 1 .255 1.072zm.105-2.835C14.692 9.178 9.375 9 6.297 9.86a.937.937 0 1 1-.543-1.793c3.541-.977 9.44-.787 13.167 1.43a.937.937 0 1 1-.978 1.614l-.029-.234z"/>
+                        </svg>
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 04</p>
+                      <h4 className={styles.perkCardTitle}>Podcast Feature on Spotify</h4>
+                      <div className={styles.perkBadgeRow}>
+                        <span className={styles.platformBadge} style={{background:'rgba(30,215,96,0.12)', borderColor:'rgba(30,215,96,0.4)', color:'#1ED760'}}>
+                          <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 0 1-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 0 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.857zm1.223-2.722a.78.78 0 0 1-1.072.257C14.1 12.257 10.539 11.82 7.2 12.78a.78.78 0 0 1-.428-1.498c3.795-1.086 7.795-.558 10.782 1.348a.78.78 0 0 1 .255 1.072zm.105-2.835C14.692 9.178 9.375 9 6.297 9.86a.937.937 0 1 1-.543-1.793c3.541-.977 9.44-.787 13.167 1.43a.937.937 0 1 1-.978 1.614l-.029-.234z"/></svg>
+                          Spotify
+                        </span>
+                      </div>
+                      <p className={styles.perkCardDesc}>Your author interview featured as a full podcast episode on our Spotify channel — reaching thousands of listeners.</p>
                     </div>
-                    <h4>Podcast Feature on Spotify</h4>
-                    <div className={styles.perkBadgeRow}>
-                      <span className={styles.platformBadge} style={{background:'rgba(30,215,96,0.12)', borderColor:'rgba(30,215,96,0.35)', color:'#1ED760'}}>
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 0 1-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 0 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.857zm1.223-2.722a.78.78 0 0 1-1.072.257C14.1 12.257 10.539 11.82 7.2 12.78a.78.78 0 0 1-.428-1.498c3.795-1.086 7.795-.558 10.782 1.348a.78.78 0 0 1 .255 1.072zm.105-2.835C14.692 9.178 9.375 9 6.297 9.86a.937.937 0 1 1-.543-1.793c3.541-.977 9.44-.787 13.167 1.43a.937.937 0 1 1-.978 1.614l-.029-.234z"/></svg>
-                        Spotify
-                      </span>
-                    </div>
-                    <p>Your author interview featured as a full podcast episode on our Spotify channel.</p>
                   </div>
 
-                  {/* 05 — Digital Magazine on Amazon Kindle / Google Play / Paperback */}
-                  <div className={`${styles.perkCard} ${styles.perkCardWide}`}>
-                    <span className={styles.perkNum}>05</span>
-                    <div className={styles.perkIconContainer}>
-                      {/* Kindle/Book icon */}
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                      </svg>
-                    </div>
-                    <h4>Feature in Digital Magazine</h4>
-                    <div className={styles.perkBadgeRow}>
-                      <span className={styles.platformBadge} style={{background:'rgba(255,153,0,0.12)', borderColor:'rgba(255,153,0,0.35)', color:'#FF9900'}}>
-                        {/* Amazon Kindle */}
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.13.226-.088.39-.046.493.124.102.17.057.336-.14.496l-.195.125c-.045.026-.097.054-.162.084-.08.038-.161.075-.244.112-2.994 1.292-6.164 1.938-9.513 1.938C7.563 22.18 3.4 21.05-.044 18.796a.62.62 0 0 1-.128-.46l.217-.315zM6.8 14.25c0-1.03.297-1.92.892-2.67.595-.75 1.408-1.125 2.438-1.125.896 0 1.65.4 2.265 1.198V10.5h1.448v7.297h-1.448v-1.02c-.636.797-1.403 1.196-2.301 1.196-1.01 0-1.81-.38-2.402-1.138-.592-.757-.888-1.65-.892-2.585zm1.512.04c0 .66.177 1.21.528 1.647.352.438.8.656 1.345.656.52 0 .96-.21 1.317-.63.358-.42.537-.964.537-1.633 0-.67-.18-1.218-.538-1.645-.358-.427-.793-.64-1.303-.64-.53 0-.975.21-1.33.636-.355.426-.533.97-.556 1.61zm10.66 3.475c.198.064.3.198.306.404.005.207-.09.348-.285.423-.12.043-.24.065-.356.065-.16 0-.33-.03-.512-.094-1.184-.387-2.31-1.024-3.38-1.912-.115-.09-.175-.2-.178-.334-.003-.133.052-.242.165-.328l.19-.12a.447.447 0 0 1 .44.005c.95.73 1.944 1.278 2.984 1.645l.626.246z"/></svg>
-                        Kindle
-                      </span>
-                      <span className={styles.platformBadge} style={{background:'rgba(66,133,244,0.12)', borderColor:'rgba(66,133,244,0.35)', color:'#4285F4'}}>
+                  {/* 05 — Digital Magazine (hero card) */}
+                  <div className={`${styles.perkCard} ${styles.perkCard05}`}>
+                    <span className={styles.perkAccentNum}>05</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 05</p>
+                      <h4 className={styles.perkCardTitle}>Feature in Digital Magazine</h4>
+                      <div className={styles.platformLogoStrip}>
+                        {/* Kindle */}
+                        <div className={styles.platformLogo}>
+                          <div className={styles.platformLogoIcon} style={{background:'rgba(255,153,0,0.12)', borderColor:'rgba(255,153,0,0.4)', color:'#FF9900'}}>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.8 14.25c0-1.03.297-1.92.892-2.67.595-.75 1.408-1.125 2.438-1.125.896 0 1.65.4 2.265 1.198V10.5h1.448v7.297h-1.448v-1.02c-.636.797-1.403 1.196-2.301 1.196-1.01 0-1.81-.38-2.402-1.138-.592-.757-.888-1.65-.892-2.585zm1.512.04c0 .66.177 1.21.528 1.647.352.438.8.656 1.345.656.52 0 .96-.21 1.317-.63.358-.42.537-.964.537-1.633 0-.67-.18-1.218-.538-1.645-.358-.427-.793-.64-1.303-.64-.53 0-.975.21-1.33.636-.355.426-.533.97-.556 1.61z"/></svg>
+                          </div>
+                          <span className={styles.platformLogoName} style={{color:'#FF9900'}}>Kindle</span>
+                        </div>
                         {/* Google Play Books */}
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12.954 11.616l2.957-2.957L6.36 3.291c-.633-.342-1.226-.39-1.746-.016l8.34 8.34zm3.461 3.462l3.074-1.729c.6-.336.929-.812.929-1.349 0-.537-.329-1.013-.929-1.349l-2.783-1.567-3.133 3.133 2.842 2.861zM4.1 4.002c-.064.197-.1.417-.1.658v14.705c0 .381.084.709.236.97l8.542-8.542L4.1 4.002zm8.854 9.962l-8.443 8.443c.499.344 1.083.284 1.713-.065l9.964-5.604-3.234-2.774z"/></svg>
-                        Google Play Books
-                      </span>
-                      <span className={styles.platformBadge} style={{background:'rgba(255,153,0,0.12)', borderColor:'rgba(255,153,0,0.35)', color:'#FF9900'}}>
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.13.226-.088.39-.046.493.124.102.17.057.336-.14.496l-.195.125c-.045.026-.097.054-.162.084-.08.038-.161.075-.244.112-2.994 1.292-6.164 1.938-9.513 1.938C7.563 22.18 3.4 21.05-.044 18.796a.62.62 0 0 1-.128-.46l.217-.315z"/></svg>
-                        Amazon Paperback
-                      </span>
+                        <div className={styles.platformLogo}>
+                          <div className={styles.platformLogoIcon} style={{background:'rgba(66,133,244,0.12)', borderColor:'rgba(66,133,244,0.4)', color:'#4285F4'}}>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.954 11.616l2.957-2.957L6.36 3.291c-.633-.342-1.226-.39-1.746-.016l8.34 8.34zm3.461 3.462l3.074-1.729c.6-.336.929-.812.929-1.349 0-.537-.329-1.013-.929-1.349l-2.783-1.567-3.133 3.133 2.842 2.861zM4.1 4.002c-.064.197-.1.417-.1.658v14.705c0 .381.084.709.236.97l8.542-8.542L4.1 4.002zm8.854 9.962l-8.443 8.443c.499.344 1.083.284 1.713-.065l9.964-5.604-3.234-2.774z"/></svg>
+                          </div>
+                          <span className={styles.platformLogoName} style={{color:'#4285F4'}}>Play Books</span>
+                        </div>
+                        {/* Amazon */}
+                        <div className={styles.platformLogo}>
+                          <div className={styles.platformLogoIcon} style={{background:'rgba(255,153,0,0.12)', borderColor:'rgba(255,153,0,0.4)', color:'#FF9900'}}>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.13.226-.088.39-.046.493.124.102.17.057.336-.14.496l-.195.125c-.045.026-.097.054-.162.084-.08.038-.161.075-.244.112-2.994 1.292-6.164 1.938-9.513 1.938C7.563 22.18 3.4 21.05-.044 18.796a.62.62 0 0 1-.128-.46l.217-.315z"/></svg>
+                          </div>
+                          <span className={styles.platformLogoName} style={{color:'#FF9900'}}>Amazon</span>
+                        </div>
+                      </div>
+                      <p className={styles.perkCardDesc}>Your feature published in our Digital Magazine — available on Amazon Kindle, Google Play Books & Amazon Paperback globally.</p>
                     </div>
-                    <p>Your feature published in our Digital Magazine available on Amazon Kindle, Google Play Books, and as Amazon Paperback.</p>
                   </div>
 
                   {/* 06 — Social Media Promotions */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>06</span>
-                    <div className={styles.perkIconContainer}>
-                      <Share2 size={28} />
+                  <div className={`${styles.perkCard} ${styles.perkCard06}`}>
+                    <span className={styles.perkAccentNum}>06</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <Share2 size={26} />
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 06</p>
+                      <h4 className={styles.perkCardTitle}>Social Media Promotions</h4>
+                      <div className={styles.perkBadgeRow}>
+                        <span className={styles.platformBadge} style={{background:'rgba(225,48,108,0.12)', borderColor:'rgba(225,48,108,0.4)', color:'#E1306C'}}>
+                          <InstagramIcon size={10}/> Instagram
+                        </span>
+                        <span className={styles.platformBadge} style={{background:'rgba(255,255,255,0.06)', borderColor:'rgba(255,255,255,0.2)', color:'#fff'}}>
+                          𝕏 Twitter
+                        </span>
+                      </div>
+                      <p className={styles.perkCardDesc}>Spotlight banners, stories & shoutouts across all our social media platforms.</p>
                     </div>
-                    <h4>Social Media Promotions</h4>
-                    <div className={styles.perkBadgeRow}>
-                      <span className={styles.platformBadge} style={{background:'rgba(225,48,108,0.12)', borderColor:'rgba(225,48,108,0.35)', color:'#E1306C'}}>
-                        <InstagramIcon size={11} /> Instagram
-                      </span>
-                      <span className={styles.platformBadge} style={{background:'rgba(29,161,242,0.12)', borderColor:'rgba(29,161,242,0.35)', color:'#1DA1F2'}}>
-                        𝕏 Twitter
-                      </span>
-                    </div>
-                    <p>Dedicated spotlight banners, stories, and shoutouts across all our social media platforms.</p>
                   </div>
 
-                  {/* 07 — Trailer of Top 30 Authors/Poets */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>07</span>
-                    <div className={styles.perkIconContainer}>
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="23 7 16 12 23 17 23 7"/>
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                      </svg>
+                  {/* 07 — Trailer of Top 30 */}
+                  <div className={`${styles.perkCard} ${styles.perkCard07}`}>
+                    <span className={styles.perkAccentNum}>07</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                        </svg>
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 07</p>
+                      <h4 className={styles.perkCardTitle}>Trailer — Top 30 Authors</h4>
+                      <p className={styles.perkCardDesc}>Cinematic trailer feature showcasing the top 30 authors & poets of the year.</p>
                     </div>
-                    <h4>Trailer — Top 30 Authors/Poets</h4>
-                    <p>Exclusive feature in our cinematic trailer showcasing the top 30 authors & poets of the year.</p>
                   </div>
 
                   {/* 08 — Feature on Website */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>08</span>
-                    <div className={styles.perkIconContainer}>
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="2" y1="12" x2="22" y2="12"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                      </svg>
+                  <div className={`${styles.perkCard} ${styles.perkCard08}`}>
+                    <span className={styles.perkAccentNum}>08</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 08</p>
+                      <h4 className={styles.perkCardTitle}>Feature on Website</h4>
+                      <p className={styles.perkCardDesc}>Dedicated author profile & feature page on the official Maybeify website.</p>
                     </div>
-                    <h4>Feature on Website</h4>
-                    <p>Dedicated author profile and feature page on the official Maybeify website.</p>
                   </div>
 
                   {/* 09 — Author On Board Certificate */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>09</span>
-                    <div className={styles.perkIconContainer}>
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                      </svg>
+                  <div className={`${styles.perkCard} ${styles.perkCard09}`}>
+                    <span className={styles.perkAccentNum}>09</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 09</p>
+                      <h4 className={styles.perkCardTitle}>Author On Board Certificate</h4>
+                      <p className={styles.perkCardDesc}>An exclusive digital & printed <em>"Author On Board"</em> certificate marking your official Maybeify induction — a credential to carry forever.</p>
                     </div>
-                    <h4>Author On Board Certificate</h4>
-                    <p>An exclusive digital & printed "Author On Board" certificate marking your official induction.</p>
                   </div>
 
-                  {/* 10 — Interview Feature in Magazine */}
-                  <div className={styles.perkCard}>
-                    <span className={styles.perkNum}>10</span>
-                    <div className={styles.perkIconContainer}>
-                      <Mic size={28} />
+                  {/* 10 — Interview in Digital Magazine */}
+                  <div className={`${styles.perkCard} ${styles.perkCard10}`}>
+                    <span className={styles.perkAccentNum}>10</span>
+                    <div className={styles.perkCardInner}>
+                      <div className={styles.perkIconWrap}>
+                        <Mic size={26} />
+                      </div>
+                      <p className={styles.perkCardLabel}>Award 10</p>
+                      <h4 className={styles.perkCardTitle}>Interview in Digital Magazine</h4>
+                      <div className={styles.perkBadgeRow}>
+                        <span className={styles.platformBadge} style={{background:'rgba(255,153,0,0.12)', borderColor:'rgba(255,153,0,0.4)', color:'#FF9900'}}>
+                          <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M6.8 14.25c0-1.03.297-1.92.892-2.67.595-.75 1.408-1.125 2.438-1.125.896 0 1.65.4 2.265 1.198V10.5h1.448v7.297h-1.448v-1.02c-.636.797-1.403 1.196-2.301 1.196-1.01 0-1.81-.38-2.402-1.138-.592-.757-.888-1.65-.892-2.585z"/></svg>
+                          Amazon Kindle
+                        </span>
+                      </div>
+                      <p className={styles.perkCardDesc}>Your author interview published in our Digital Magazine — available on Amazon Kindle for global readers worldwide.</p>
                     </div>
-                    <h4>Interview in Digital Magazine</h4>
-                    <div className={styles.perkBadgeRow}>
-                      <span className={styles.platformBadge} style={{background:'rgba(255,153,0,0.12)', borderColor:'rgba(255,153,0,0.35)', color:'#FF9900'}}>
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M6.8 14.25c0-1.03.297-1.92.892-2.67.595-.75 1.408-1.125 2.438-1.125.896 0 1.65.4 2.265 1.198V10.5h1.448v7.297h-1.448v-1.02c-.636.797-1.403 1.196-2.301 1.196-1.01 0-1.81-.38-2.402-1.138-.592-.757-.888-1.65-.892-2.585z"/></svg>
-                        Amazon Kindle
-                      </span>
-                    </div>
-                    <p>Your author interview featured in our Digital Magazine, available on Amazon Kindle for global readers.</p>
                   </div>
 
                 </div>
