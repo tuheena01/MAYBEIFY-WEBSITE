@@ -171,6 +171,17 @@
   background: rgba(201, 160, 80, 0.05);
 }
 
+.mobileMenuToggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  z-index: 250;
+  padding: 8px;
+  border-radius: 50%;
+}
+
 @media (max-width: 1024px) { .inner { padding: 0 2rem; gap: 1rem; } }
 @media (max-width: 768px) {
   .inner {
@@ -209,17 +220,6 @@
     margin: 0;
     transform: scale(0.8);
   }
-}
-
-.mobileMenuToggle {
-  display: none;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  z-index: 250;
-  padding: 8px;
-  border-radius: 50%;
 }
 
 .mobileDrawer {
