@@ -384,7 +384,7 @@
 .field input, .field textarea {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--navy-border);
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 0.92rem;
@@ -403,7 +403,7 @@
 .field input::placeholder, .field textarea::placeholder {
   color: var(--text3);
   font-style: italic;
-  opacity: 0.4;
+  opacity: 0.65;
 }
 
 .actionRow {

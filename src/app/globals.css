@@ -41,9 +41,9 @@
   --gold-glow:     rgba(148,110,42,0.18);
 
   /* ── Typography ── */
-  --text:          #16251D;   /* Very deep forest green for optimal readability */
-  --text2:         rgba(22, 37, 29, 0.7);
-  --text3:         rgba(22, 37, 29, 0.45);
+  --text:          #0A120E;   /* Deep solid charcoal green for headers/active text */
+  --text2:         #283C32;   /* Solid forest slate for paragraphs/secondary text */
+  --text3:         #5A6F65;   /* Solid muted slate green for labels and place-holders */
 }
 
 *, *::before, *::after { 

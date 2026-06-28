@@ -285,14 +285,14 @@
 .inputIcon {
   position: absolute;
   left: 0;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text3);
   pointer-events: none;
   transition: color 0.3s;
 }
 
 .inputWrapper input {
   background: transparent; border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--navy-border);
   color: var(--text); font-family: var(--font-sans); font-size: 0.95rem;
   font-weight: 300; padding: 12px 0 12px 28px; outline: none; width: 100%;
   transition: all 0.4s var(--ease);
@@ -308,8 +308,8 @@
 }
 
 .field textarea {
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--navy3);
+  border: 1px solid var(--navy-border);
   border-radius: 4px;
   color: var(--text); font-family: var(--font-sans); font-size: 0.95rem;
   font-weight: 300; padding: 12px; outline: none; resize: none; width: 100%;
@@ -318,11 +318,10 @@
 
 .field textarea:focus {
   border-color: var(--gold);
-  background: rgba(255, 255, 255, 0.02);
 }
 
 .field input::placeholder, .field textarea::placeholder {
-  color: rgba(255, 255, 255, 0.25); font-style: italic;
+  color: var(--text3); font-style: italic; opacity: 0.65;
 }
 
 .formActions {
