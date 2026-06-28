@@ -27,12 +27,13 @@
 .left { display: flex; align-items: center; gap: 3rem; flex: 1; }
 .right { display: flex; align-items: center; gap: 2.5rem; justify-content: flex-end; flex: 1; }
 
-/* Logo — centred by flex:1 siblings */
+/* Logo — centred by flex:1 siblings with guaranteed spacing */
 .logo {
   display: flex; flex-direction: column; align-items: center;
   text-decoration: none; gap: 4px; transition: transform 0.4s var(--ease);
   flex-shrink: 0;
   white-space: nowrap;
+  margin: 0 4.5rem;
 }
 .logo:hover { transform: scale(1.02); }
 
@@ -111,9 +112,20 @@
   transform: translateY(-2px);
 }
 
-.navArrows, .navArrowsRight {
+.navArrows {
+  position: absolute;
+  left: 1.5rem;
   display: flex;
   align-items: center;
+  z-index: 10;
+}
+
+.navArrowsRight {
+  position: absolute;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  z-index: 10;
 }
 
 .soundToggle {
