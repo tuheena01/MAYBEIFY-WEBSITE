@@ -2,14 +2,14 @@
 
 import { useModal } from '@/context/ModalContext';
 import { useState } from 'react';
-import { X, Award, Sparkles, BookOpen, User, Mail, PenTool, CheckCircle2 } from 'lucide-react';
+import { X, Award, Sparkles, User, Mail, CheckCircle2, MessageSquare, Instagram } from 'lucide-react';
 import styles from './NominateModal.module.css';
 
 export default function NominateModal() {
   const { isNominateModalOpen, setNominateModalOpen } = useModal();
   const [step, setStep] = useState(1);
   const [status, setStatus] = useState(null);
-  const [form, setForm] = useState({ name: '', email: '', title: '', genre: '', reason: '', synopsis: '' });
+  const [form, setForm] = useState({ name: '', email: '', whatsapp: '', instagram: '', reason: '' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +42,7 @@ export default function NominateModal() {
     setTimeout(() => {
       setStep(1);
       setStatus(null);
-      setForm({ name: '', email: '', title: '', genre: '', reason: '', synopsis: '' });
+      setForm({ name: '', email: '', whatsapp: '', instagram: '', reason: '' });
     }, 300);
   };
 
@@ -115,8 +115,8 @@ export default function NominateModal() {
             <div className={styles.formSidebar}>
               <div className={styles.sidebarHeader}>
                 <span className={styles.eyebrow}>Step 2 of 2</span>
-                <h2 className={styles.sidebarTitle}>Author & <br /><em>Manuscript</em></h2>
-                <p className={styles.sidebarText}>Provide details about yourself and the story you wish to nominate.</p>
+                <h2 className={styles.sidebarTitle}>Author & <br /><em>Nomination</em></h2>
+                <p className={styles.sidebarText}>Provide details about yourself to register your nomination.</p>
               </div>
               <div className={styles.lockBox}>
                 <Sparkles size={16} className={styles.lockIcon} />
@@ -157,52 +157,40 @@ export default function NominateModal() {
 
                 <div className={styles.row}>
                   <div className={styles.field}>
-                    <label>Manuscript Title</label>
+                    <label>WhatsApp Number</label>
                     <div className={styles.inputWrapper}>
-                      <BookOpen size={16} className={styles.inputIcon} />
+                      <MessageSquare size={16} className={styles.inputIcon} />
                       <input 
                         type="text" 
                         required 
-                        placeholder="Title or working title" 
-                        value={form.title} 
-                        onChange={e => setForm({...form, title: e.target.value})} 
+                        placeholder="WhatsApp number" 
+                        value={form.whatsapp} 
+                        onChange={e => setForm({...form, whatsapp: e.target.value})} 
                       />
                     </div>
                   </div>
                   <div className={styles.field}>
-                    <label>Genre</label>
+                    <label>Instagram ID (Optional)</label>
                     <div className={styles.inputWrapper}>
-                      <PenTool size={16} className={styles.inputIcon} />
+                      <Instagram size={16} className={styles.inputIcon} />
                       <input 
                         type="text" 
-                        required 
-                        placeholder="Literary Fiction, Poetry, Memoir..." 
-                        value={form.genre} 
-                        onChange={e => setForm({...form, genre: e.target.value})} 
+                        placeholder="e.g. @yourhandle" 
+                        value={form.instagram} 
+                        onChange={e => setForm({...form, instagram: e.target.value})} 
                       />
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.field}>
-                  <label>Story Synopsis</label>
+                  <label>Why do you think you want to nominate yourself for this award?</label>
                   <textarea 
                     required 
-                    placeholder="Briefly summarize your manuscript..." 
-                    value={form.synopsis} 
-                    onChange={e => setForm({...form, synopsis: e.target.value})} 
-                    rows={3} 
-                  />
-                </div>
-
-                <div className={styles.field}>
-                  <label>Why should this work win the Golden Scroll?</label>
-                  <textarea 
-                    required 
-                    placeholder="Explain the unique themes, impact, or promise of this manuscript..." 
+                    placeholder="Explain why you are nominating yourself, your journey, and what makes your voice/work deserving..." 
                     value={form.reason} 
                     onChange={e => setForm({...form, reason: e.target.value})} 
-                    rows={3} 
+                    rows={4} 
                   />
                 </div>
 
@@ -230,7 +218,7 @@ export default function NominateModal() {
             </div>
             <h2 className={styles.successTitle}>Nomination Submitted.</h2>
             <p className={styles.successText}>
-              Your manuscript <strong>"{form.title}"</strong> is now officially under consideration for the 2026 Maybeify Golden Scroll.
+              Thank you, <strong>{form.name}</strong>! Your nomination is now officially under consideration for the 2026 Maybeify Golden Scroll.
             </p>
             <p className={styles.successSub}>
               Our awards committee evaluates entries on a rolling basis. You will receive a confirmation email shortly, and finalists will be contacted directly.

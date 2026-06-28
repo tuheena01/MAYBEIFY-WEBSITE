@@ -10,37 +10,34 @@ function sanitize(str) {
 export async function POST(req) {
   try {
     const data = await req.json();
-    const { name, email, title, genre, yearOfPublishing, instagram, whatsapp, phone, reason, synopsis } = data;
+    const { name, email, whatsapp, instagram, reason } = data;
 
     // 1. Check required fields
-    if (!name || !email || !title || !genre || !yearOfPublishing || !whatsapp || !phone || !reason || !synopsis) {
-      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+    if (!name || !email || !whatsapp || !reason) {
+      return NextResponse.json({ error: 'Name, email, whatsapp, and reason are required' }, { status: 400 });
     }
 
-    // 2. Sanitize inputs
+    // 2. Sanitize and default inputs
     const cleanName = sanitize(name);
     const cleanEmail = sanitize(email);
-    const cleanTitle = sanitize(title);
-    const cleanGenre = sanitize(genre);
-    const cleanYear = sanitize(yearOfPublishing);
-    const cleanInsta = instagram ? sanitize(instagram) : null;
     const cleanWhatsapp = sanitize(whatsapp);
-    const cleanPhone = sanitize(phone);
+    const cleanInsta = instagram ? sanitize(instagram) : null;
     const cleanReason = sanitize(reason);
-    const cleanSynopsis = sanitize(synopsis);
+
+    // Default fields not requested in the new form (preserving database compatibility)
+    const cleanTitle = "N/A";
+    const cleanGenre = "N/A";
+    const cleanYear = "N/A";
+    const cleanPhone = "N/A";
+    const cleanSynopsis = "N/A";
 
     // 3. Length validations
     if (
       cleanName.length > 100 ||
       cleanEmail.length > 150 ||
-      cleanTitle.length > 200 ||
-      cleanGenre.length > 100 ||
-      cleanYear.length > 50 ||
       (cleanInsta && cleanInsta.length > 100) ||
       cleanWhatsapp.length > 50 ||
-      cleanPhone.length > 50 ||
-      cleanReason.length > 5000 ||
-      cleanSynopsis.length > 5000
+      cleanReason.length > 5000
     ) {
       return NextResponse.json({ error: 'Input length exceeds maximum allowed limit' }, { status: 400 });
     }

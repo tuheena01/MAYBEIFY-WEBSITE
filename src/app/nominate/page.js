@@ -30,13 +30,8 @@ export default function NominatePage() {
   const [form, setForm] = useState({
     name: '',
     email: '',
-    title: '', // Book Name
-    genre: '',
-    yearOfPublishing: '',
-    instagram: '',
     whatsapp: '',
-    phone: '',
-    synopsis: '',
+    instagram: '',
     reason: ''
   });
 
@@ -68,13 +63,8 @@ export default function NominatePage() {
     setForm({
       name: '',
       email: '',
-      title: '',
-      genre: '',
-      yearOfPublishing: '',
-      instagram: '',
       whatsapp: '',
-      phone: '',
-      synopsis: '',
+      instagram: '',
       reason: ''
     });
     setStatus(null);
@@ -402,7 +392,7 @@ export default function NominatePage() {
                 <form onSubmit={handleSubmit} className={styles.form}>
                   <div className={styles.formRow}>
                     <div className={styles.field}>
-                      <label>Author Full Name</label>
+                      <label>Full Name</label>
                       <div className={styles.inputWrapper}>
                         <User size={16} className={styles.inputIcon} />
                         <input 
@@ -432,49 +422,6 @@ export default function NominatePage() {
 
                   <div className={styles.formRow}>
                     <div className={styles.field}>
-                      <label>Book Name / Manuscript Title</label>
-                      <div className={styles.inputWrapper}>
-                        <BookOpen size={16} className={styles.inputIcon} />
-                        <input 
-                          type="text" 
-                          required 
-                          placeholder="Working title" 
-                          value={form.title} 
-                          onChange={e => setForm({...form, title: e.target.value})} 
-                        />
-                      </div>
-                    </div>
-
-                    <div className={styles.field}>
-                      <label>Year of Publishing</label>
-                      <div className={styles.inputWrapper}>
-                        <Calendar size={16} className={styles.inputIcon} />
-                        <input 
-                          type="text" 
-                          required 
-                          placeholder="e.g. 2026 or In-Development" 
-                          value={form.yearOfPublishing} 
-                          onChange={e => setForm({...form, yearOfPublishing: e.target.value})} 
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.formRow}>
-                    <div className={styles.field}>
-                      <label>Instagram ID</label>
-                      <div className={styles.inputWrapper}>
-                        <InstagramIcon size={16} className={styles.inputIcon} />
-                        <input 
-                          type="text" 
-                          placeholder="e.g. @yourhandle (optional)" 
-                          value={form.instagram} 
-                          onChange={e => setForm({...form, instagram: e.target.value})} 
-                        />
-                      </div>
-                    </div>
-
-                    <div className={styles.field}>
                       <label>WhatsApp Number</label>
                       <div className={styles.inputWrapper}>
                         <MessageCircle size={16} className={styles.inputIcon} />
@@ -487,57 +434,29 @@ export default function NominatePage() {
                         />
                       </div>
                     </div>
-                  </div>
-
-                  <div className={styles.formRow}>
-                    <div className={styles.field}>
-                      <label>Calling Number</label>
-                      <div className={styles.inputWrapper}>
-                        <Phone size={16} className={styles.inputIcon} />
-                        <input 
-                          type="text" 
-                          required 
-                          placeholder="Calling phone number" 
-                          value={form.phone} 
-                          onChange={e => setForm({...form, phone: e.target.value})} 
-                        />
-                      </div>
-                    </div>
 
                     <div className={styles.field}>
-                      <label>Select Genre</label>
+                      <label>Instagram ID (Optional)</label>
                       <div className={styles.inputWrapper}>
-                        <PenTool size={16} className={styles.inputIcon} />
+                        <InstagramIcon size={16} className={styles.inputIcon} />
                         <input 
                           type="text" 
-                          required 
-                          placeholder="Literary Fiction, Poetry, Memoir, etc." 
-                          value={form.genre} 
-                          onChange={e => setForm({...form, genre: e.target.value})} 
+                          placeholder="e.g. @yourhandle" 
+                          value={form.instagram} 
+                          onChange={e => setForm({...form, instagram: e.target.value})} 
                         />
                       </div>
                     </div>
                   </div>
 
                   <div className={styles.field}>
-                    <label>Book Synopsis</label>
+                    <label>Why do you think you want to nominate yourself for this award?</label>
                     <textarea 
                       required 
-                      placeholder="Outline the core story, premise, and characters..." 
-                      value={form.synopsis} 
-                      onChange={e => setForm({...form, synopsis: e.target.value})} 
-                      rows={4} 
-                    />
-                  </div>
-
-                  <div className={styles.field}>
-                    <label>Why should this work win the 2026 Literacy Award?</label>
-                    <textarea 
-                      required 
-                      placeholder="Explain the unique themes, impact, and legacy value of this manuscript..." 
+                      placeholder="Explain why you are nominating yourself, your journey, and what makes your voice/work deserving..." 
                       value={form.reason} 
                       onChange={e => setForm({...form, reason: e.target.value})} 
-                      rows={4} 
+                      rows={5} 
                     />
                   </div>
 
@@ -562,13 +481,13 @@ export default function NominatePage() {
                 </div>
                 <h2>Nomination Registered</h2>
                 <p className={styles.successText}>
-                  Thank you! <strong>"{form.title}"</strong> is officially registered and locked in for the 2026 Maybeify Literacy Legacy Awards.
+                  Thank you! <strong>{form.name}</strong>, your nomination is officially registered and locked in for the 2026 Maybeify Literacy Legacy Awards.
                 </p>
                 <p className={styles.successSub}>
                   Our awards board will evaluate your entry and send updates to <strong>{form.email}</strong>. Finalists will be selected in late-2026.
                 </p>
                 <button className={styles.resetBtn} onClick={handleReset}>
-                  Submit Another Entry
+                  Nominate Again
                 </button>
               </motion.div>
             )}
