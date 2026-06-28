@@ -6,15 +6,18 @@ import styles from './Admin.module.css';
 export default function AdminDashboard() {
   const [apps, setApps] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
+  const [nominations, setNominations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch('/api/admin/applications').then(res => res.json()),
-      fetch('/api/admin/pending-users').then(res => res.json())
-    ]).then(([appsData, usersData]) => {
+      fetch('/api/admin/pending-users').then(res => res.json()),
+      fetch('/api/admin/nominations').then(res => res.json())
+    ]).then(([appsData, usersData, nomsData]) => {
       setApps(appsData);
       setPendingUsers(usersData);
+      setNominations(Array.isArray(nomsData) ? nomsData : []);
       setLoading(false);
     });
   }, []);
@@ -114,6 +117,36 @@ export default function AdminDashboard() {
               <div className={styles.actions}>
                 <button className={styles.approveBtn} onClick={() => handleActivateUser(user)}>Activate Account</button>
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── NOMINATIONS ── */}
+      <section className={styles.section} style={{ marginTop: '4rem' }}>
+        <h2 className={styles.sectionTitle}>Award Nominations</h2>
+        <div className={styles.grid}>
+          {nominations.length === 0 && <p className={styles.empty}>No nominations submitted.</p>}
+          {nominations.map(nom => (
+            <div key={nom.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span className={styles.date}>{new Date(nom.createdAt).toLocaleDateString()}</span>
+                  {nom.instagram && (
+                    <span className={styles.discountBadge} style={{ background: '#E1306C', color: '#fff', fontSize: '0.6rem' }}>
+                      Instagram: {nom.instagram}
+                    </span>
+                  )}
+                </div>
+                <h3>{nom.name}</h3>
+                <span className={styles.genre}>WhatsApp: {nom.whatsapp}</span>
+              </div>
+              <div className={styles.authorInfo}>
+                <span>Email: {nom.email}</span>
+              </div>
+              <p className={styles.synopsis} style={{ whiteSpace: 'pre-wrap', marginTop: '1rem', color: 'var(--text2)' }}>
+                <strong>Reason:</strong> {nom.reason}
+              </p>
             </div>
           ))}
         </div>
