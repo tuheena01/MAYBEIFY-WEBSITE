@@ -15,9 +15,7 @@ export default function TopBar() {
           <span className={styles.divider}>|</span>
           <p className={styles.message}>The "Archive" Collection — Now Available.</p>
         </div>
-        <Link href="/shop" className={styles.shopLink}>
-          Explore Shop <span>→</span>
-        </Link>
+
       </div>
     </div>
   );
