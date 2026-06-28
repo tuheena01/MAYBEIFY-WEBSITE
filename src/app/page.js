@@ -339,27 +339,75 @@ export default function Home() {
       {/* ══════ FEATURED AUTHORS ══════ */}
       <section className={styles.authorsSection}>
         <div className="container">
-          <motion.div 
-            className={styles.authorCard}
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
+          <motion.div
+            className={styles.reviewsHeader}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
             viewport={{ once: true }}
           >
-            <img 
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800" 
-              alt="Author" 
-              className={styles.authorImg} 
-            />
-            <div>
-              <p className={styles.quote}>
-                "Published in 21 days. Sold in 12 countries. Maybeify didn't just give me a platform; they gave me a legacy."
-              </p>
-              <span className={styles.authorName}>Elena Vance · Award-Winning Novelist</span>
-            </div>
+            <span className={styles.reviewsEyebrow}>Author Voices</span>
+            <h2 className={styles.reviewsTitle}>Words From Our Authors</h2>
           </motion.div>
+
+          <div className={styles.reviewsGrid}>
+            {/* Review 1 — Punit */}
+            <motion.div
+              className={styles.authorCard}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <div className={styles.authorImgWrap}>
+                <img
+                  src="/author_punit.jpg"
+                  alt="Punit — Author"
+                  className={styles.authorImg}
+                />
+                <div className={styles.authorImgGlow} />
+              </div>
+              <div className={styles.authorCardContent}>
+                <div className={styles.reviewStars}>★★★★★</div>
+                <p className={styles.quote}>
+                  "What sets Maybeify Publishers apart is their holistic approach to content creation. They don't just print words on a page; they build ecosystems around an author's voice. Their dedication, professionalism, and creative synergy have made the entire process seamless and incredibly rewarding.
+                  <br /><br />
+                  If you are an author or creator looking for a publisher who will champion your entire vision across multiple platforms, I cannot recommend Maybeify Publishers highly enough. They are a rare gem in the industry. A special thanks to Tuheena for her incredible eye and dedication to the text."
+                </p>
+                <span className={styles.authorName}>Punit · Author</span>
+              </div>
+            </motion.div>
+
+            {/* Review 2 — Roxana Negut */}
+            <motion.div
+              className={styles.authorCard}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.25 }}
+              viewport={{ once: true }}
+            >
+              <div className={styles.authorImgWrap}>
+                <img
+                  src="/author_roxana.png"
+                  alt="Roxana Negut — Author, Poet & Journalist"
+                  className={styles.authorImg}
+                />
+                <div className={styles.authorImgGlow} />
+              </div>
+              <div className={styles.authorCardContent}>
+                <div className={styles.reviewStars}>★★★★★</div>
+                <p className={styles.quote}>
+                  "My name is Roxana Neguț, and I am an author, poet, and journalist from Romania. I have been collaborating with Maybeify Publishing House for over four years, a period during which we have developed a partnership built on trust and professionalism. Alongside them, I have been published in various anthologies, as well as releasing my poetry collection, <em>'The Woman, The Old Woman, The Child,'</em> and my prose volume, <em>'Fantastic Land of Never-Ending Stories.'</em>
+                  <br /><br />
+                  Maybeify is a professional Publishing House that respects, promotes, and supports its authors every step of the way. I whole-heartedly recommend them to any writer looking for a dedicated team! I extend my joyful thanks and gratitude for all their support, and I wish them continued success!"
+                </p>
+                <span className={styles.authorName}>Roxana Neguț · Author, Poet & Journalist · Romania</span>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
+
 
       {/* ══════ FINAL CTA ══════ */}
       <section className={styles.ctaSection}>
