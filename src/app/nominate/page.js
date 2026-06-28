@@ -272,9 +272,6 @@ export default function NominatePage() {
                         <span className={styles.platformBadge} style={{background:'rgba(225,48,108,0.12)', borderColor:'rgba(225,48,108,0.4)', color:'#E1306C'}}>
                           <InstagramIcon size={10}/> Instagram
                         </span>
-                        <span className={styles.platformBadge} style={{background:'rgba(255,255,255,0.06)', borderColor:'rgba(255,255,255,0.2)', color:'#fff'}}>
-                          𝕏 Twitter
-                        </span>
                       </div>
                       <p className={styles.perkCardDesc}>Spotlight banners, stories & shoutouts across all our social media platforms.</p>
                     </div>
