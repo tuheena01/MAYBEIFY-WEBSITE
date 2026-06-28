@@ -200,7 +200,7 @@
    SHOWCASE WALL: 3D Floating Books
 ═══════════════════════════════════════ */
 .showcaseSection {
-  padding: 12rem 0;
+  padding: 7rem 0;
   background: var(--navy);
   position: relative;
 }
@@ -268,14 +268,14 @@
    THE PROCESS: Luxury Timeline
 ═══════════════════════════════════════ */
 .processSection {
-  padding: 12rem 0;
+  padding: 7rem 0;
   background: var(--navy2);
 }
 
 .processTitle {
   font-size: clamp(2.5rem, 5vw, 4rem);
   text-align: center;
-  margin-bottom: 8rem;
+  margin-bottom: 3.5rem;
 }
 
 .processTitle em { font-style: italic; color: var(--gold); }
@@ -513,7 +513,7 @@
    FINAL CTA
 ═══════════════════════════════════════ */
 .ctaSection {
-  padding: 15rem 0;
+  padding: 8rem 0;
   text-align: center;
   background: radial-gradient(circle at center, var(--navy3) 0%, var(--navy) 100%);
 }
