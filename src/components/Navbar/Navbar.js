@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useModal } from '@/context/ModalContext';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Sun, Moon, Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from './Navbar.module.css';
 
 const PAGES = [
@@ -20,6 +21,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [theme, setTheme] = useState('dark');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const audioRef = useRef(null);
   const pathname = usePathname();
 
@@ -98,6 +100,41 @@ export default function Navbar() {
             Become an Author
           </button>
         </div>
+
+        {/* Mobile Hamburger Toggle */}
+        <button className={styles.mobileMenuToggle} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
+        {/* Mobile Menu Drawer */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div 
+              className={styles.mobileDrawer}
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            >
+              <div className={styles.drawerLinks}>
+                <Link href="/" className={styles.drawerLink} onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                <Link href="/challenge" className={styles.drawerLink} onClick={() => setMobileMenuOpen(false)}>✦ 21-Day Challenge</Link>
+                <Link href="/referrals" className={styles.drawerLink} onClick={() => setMobileMenuOpen(false)}>Referral Program</Link>
+                <Link href="/nominate" className={styles.drawerLink} onClick={() => setMobileMenuOpen(false)}>Nominate 🏆</Link>
+                <Link href="/author/login" className={styles.drawerLink} onClick={() => setMobileMenuOpen(false)}>Author Portal</Link>
+                <button 
+                  className={styles.drawerBtn} 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setSubmitModalOpen(true);
+                  }}
+                >
+                  Become an Author
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className={styles.navArrowsRight}>
           {next && (
