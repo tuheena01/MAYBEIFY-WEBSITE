@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { X, Trophy } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import styles from './SpinWheelChallenge.module.css';
 
 export default function SpinWheelChallenge() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [spinState, setSpinState] = useState('intro'); // 'intro', 'spinning', 'congrats', 'form', 'success'
   const [rotation, setRotation] = useState(0);
@@ -33,6 +35,7 @@ export default function SpinWheelChallenge() {
 
   // Auto-open on landing after 2.5 seconds
   useEffect(() => {
+    if (pathname === '/nominate') return;
     const seen = sessionStorage.getItem('maybeify_spin_seen');
     if (!seen) {
       const t = setTimeout(() => {
@@ -41,7 +44,7 @@ export default function SpinWheelChallenge() {
       }, 2500);
       return () => clearTimeout(t);
     }
-  }, []);
+  }, [pathname]);
 
   const handleSpin = () => {
     if (spinState !== 'intro') return;
@@ -111,6 +114,7 @@ export default function SpinWheelChallenge() {
     }
   };
 
+  if (pathname === '/nominate') return null;
   if (!isOpen) return null;
 
   return (
