@@ -109,7 +109,7 @@ export default function AuthorProfile() {
           <SpotlightCard className="glass" style={{ padding: '2rem', textAlign: 'center' }}>
             <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1.5rem' }}>
               <img 
-                src={profile.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'} 
+                src={profile.photo || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'} 
                 alt={profile.name} 
                 style={{
                   width: '150px',
