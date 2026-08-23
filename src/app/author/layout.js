@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './authorLayout.module.css';
-import { LayoutDashboard, MessageSquare, DollarSign, Users, LogOut, ShieldAlert, BookOpen } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, DollarSign, Users, LogOut, ShieldAlert, BookOpen, TrendingUp } from 'lucide-react';
 
 export default function AuthorLayout({ children }) {
   const pathname = usePathname();
@@ -20,6 +20,9 @@ export default function AuthorLayout({ children }) {
             <Link href="/author/dashboard" className={`${styles.navLink} ${pathname === '/author/dashboard' ? styles.active : ''}`}>
               <LayoutDashboard size={20} /> Dashboard
             </Link>
+            <Link href="/author/sales" className={`${styles.navLink} ${pathname === '/author/sales' ? styles.active : ''}`}>
+              <TrendingUp size={20} /> Book Sales
+            </Link>
             <Link href="/author/communications" className={`${styles.navLink} ${pathname === '/author/communications' ? styles.active : ''}`}>
               <MessageSquare size={20} /> Communications
             </Link>
@@ -28,15 +31,6 @@ export default function AuthorLayout({ children }) {
             </Link>
             <Link href="/author/referrals" className={`${styles.navLink} ${pathname === '/author/referrals' ? styles.active : ''}`}>
               <Users size={20} /> Referrals
-            </Link>
-
-            <div className={styles.navDivider}>Management</div>
-            
-            <Link href="/author/project-head" className={`${styles.navLink} ${pathname === '/author/project-head' ? styles.active : ''}`}>
-              <ShieldAlert size={20} /> Project Head
-            </Link>
-            <Link href="/author/compiler" className={`${styles.navLink} ${pathname === '/author/compiler' ? styles.active : ''}`}>
-              <BookOpen size={20} /> Compiler Portal
             </Link>
           </nav>
           <div className={styles.sidebarFooter}>

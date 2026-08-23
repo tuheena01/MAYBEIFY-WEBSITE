@@ -1,14 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Copy, CheckCircle } from 'lucide-react';
 
 export default function AuthorReferrals() {
   const [copied, setCopied] = useState(false);
+  const [referralLink, setReferralLink] = useState('');
   const referralCode = "MAYBE26-X9A2"; // Mock code, in real app fetched from user profile
-  const referralLink = `https://maybeify.com/submit?ref=${referralCode}`;
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setReferralLink(`${window.location.origin}/submit?ref=${referralCode}`);
+    }
+  }, [referralCode]);
 
   const copyToClipboard = () => {
+    if (!referralLink) return;
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

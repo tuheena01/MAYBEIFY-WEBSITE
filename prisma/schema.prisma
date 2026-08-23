@@ -28,6 +28,7 @@ model User {
   messagesSent  Message[]    @relation("MessagesSent")
   messagesRecv  Message[]    @relation("MessagesReceived")
   enrollments   ChallengeEnrollment[]
+  books         Book[]
 }
 
 model Manuscript {
@@ -131,3 +132,40 @@ model Nomination {
   status           String   @default("PENDING")
   createdAt        DateTime @default(now())
 }
+
+model Book {
+  id              String                @id @default(uuid())
+  title           String
+  price           Float
+  authorId        String
+  author          User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  sales           BookSale[]
+  platformReports SalesPlatformReport[]
+  createdAt       DateTime              @default(now())
+}
+
+model BookSale {
+  id          String   @id @default(uuid())
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  quantity    Int      @default(1)
+  amount      Float    
+  buyerName   String?
+  buyerEmail  String?
+  purchasedAt DateTime @default(now())
+}
+
+model SalesPlatformReport {
+  id          String   @id @default(uuid())
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  platform    String   // "AMAZON", "KINDLE", "PLAYBOOKS"
+  month       String   // e.g. "July 2026"
+  year        Int
+  unitsSold   Int      @default(0)
+  revenue     Float    @default(0.0)
+  screenshot  String?  // URL to Amazon dashboard screenshot
+  createdAt   DateTime @default(now())
+}
+
+
