@@ -412,13 +412,13 @@ export default function AdminDashboard() {
             fontFamily: 'monospace, sans-serif',
             fontSize: '0.8rem',
             color: '#c9d1d9',
-            minWidth: '1200px'
+            minWidth: '1000px'
           }}>
             <thead>
               {/* Alphabet row */}
               <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a', textAlign: 'center' }}>
                 <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a' }}></th>
-                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map((l, i) => (
+                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map((l, i) => (
                   <th key={i} style={{ padding: '0.3rem', borderRight: '1px solid #2d303a', color: '#888' }}>{l}</th>
                 ))}
                 <th style={{ width: '60px' }}>Actions</th>
@@ -434,7 +434,6 @@ export default function AdminDashboard() {
                 <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>{labelSales}</td>
                 <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>Royalty (unit)</td>
                 <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white', fontWeight: 'bold' }}>{labelRoyalty}</td>
-                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Screenshot Proof URL</td>
                 <td style={{ background: '#1c1e24' }}></td>
               </tr>
             </thead>
@@ -442,7 +441,7 @@ export default function AdminDashboard() {
               {rows.length === 0 ? (
                 <tr>
                   <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                  <td colSpan={10} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                  <td colSpan={9} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
                     No rows configured for {title}. Click "Add Row" to initialize.
                   </td>
                 </tr>
@@ -540,17 +539,6 @@ export default function AdminDashboard() {
                       {/* Total Royalty */}
                       <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(255, 255, 255, 0.04)', textAlign: 'center', color: colorTheme, fontWeight: 'bold' }}>
                         ₹{totalRoyalty.toFixed(2)}
-                      </td>
-
-                      {/* Screenshot URL */}
-                      <td style={{ borderRight: '1px solid #2d303a' }}>
-                        <input 
-                          type="text" 
-                          value={row.screenshot || ''} 
-                          onChange={(e) => handleCellChange(platform, idx, 'screenshot', e.target.value)} 
-                          placeholder="URL Link"
-                          style={{ width: '140px', border: 'none', background: 'transparent', color: '#aaa', outline: 'none', fontSize: '0.75rem' }}
-                        />
                       </td>
 
                       {/* Actions Delete */}

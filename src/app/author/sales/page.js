@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
-import { BookOpen, Download, Eye, X } from 'lucide-react';
+import { BookOpen, Download } from 'lucide-react';
 
 export default function BookSales() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedBookId, setSelectedBookId] = useState('');
-  const [activeProof, setActiveProof] = useState(null);
 
   useEffect(() => {
     fetch('/api/author/sales')
@@ -148,14 +147,14 @@ export default function BookSales() {
             fontSize: '0.82rem',
             textAlign: 'center',
             color: '#c9d1d9',
-            minWidth: '1000px'
+            minWidth: '900px'
           }}>
             <thead>
               {/* Excel letters */}
               <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a' }}>
                 <th style={{ width: '45px', background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}></th>
-                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map((l, idx) => (
-                  <th key={idx} style={{ padding: '0.4rem', borderRight: l !== 'I' ? '1px solid #2d303a' : 'none', color: '#888' }}>{l}</th>
+                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map((l, idx) => (
+                  <th key={idx} style={{ padding: '0.4rem', borderRight: l !== 'H' ? '1px solid #2d303a' : 'none', color: '#888' }}>{l}</th>
                 ))}
               </tr>
               {/* Headers */}
@@ -167,15 +166,14 @@ export default function BookSales() {
                 <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Month & Year</td>
                 <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>{labelSales}</td>
                 <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>Royalty (unit)</td>
-                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white', fontWeight: 'bold' }}>{labelRoyalty}</td>
-                <td style={{ padding: '0.6rem', background: '#1c1e24' }}>Proof Attachment</td>
+                <td style={{ padding: '0.6rem', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white', fontWeight: 'bold' }}>{labelRoyalty}</td>
               </tr>
             </thead>
             <tbody>
               {reportsList.length === 0 ? (
                 <tr>
                   <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                  <td colSpan={9} style={{ padding: '2.5rem', color: '#666', fontStyle: 'italic' }}>
+                  <td colSpan={8} style={{ padding: '2.5rem', color: '#666', fontStyle: 'italic' }}>
                     No sales reports found for this platform.
                   </td>
                 </tr>
@@ -199,29 +197,7 @@ export default function BookSales() {
                       <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a' }}>{row.month} {row.year}</td>
                       <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', fontWeight: 'bold' }}>{unitsSold}</td>
                       <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a' }}>₹{royaltyUnit.toFixed(2)}</td>
-                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: colorTheme, background: 'rgba(255,255,255,0.01)' }}>₹{totalRoyalty.toFixed(2)}</td>
-                      <td style={{ padding: '0.6rem' }}>
-                        {row.screenshot ? (
-                          <button
-                            onClick={() => setActiveProof({ ...row, proofLink: row.screenshot })}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              color: 'var(--accent)',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.3rem',
-                              fontWeight: 'bold',
-                              fontSize: '0.8rem'
-                            }}
-                          >
-                            <Eye size={12} /> View Proof
-                          </button>
-                        ) : (
-                          <span style={{ color: '#555' }}>--</span>
-                        )}
-                      </td>
+                      <td style={{ padding: '0.6rem', fontWeight: 'bold', color: colorTheme, background: 'rgba(255,255,255,0.01)' }}>₹{totalRoyalty.toFixed(2)}</td>
                     </tr>
                   );
                 })
@@ -325,107 +301,6 @@ export default function BookSales() {
       ) : (
         <div className="glass" style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>
           Select a book card above to load platform sales spreadsheets.
-        </div>
-      )}
-
-      {/* Lightbox Screenshot Modal */}
-      {activeProof && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.85)',
-          zIndex: 9999,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '2rem',
-          backdropFilter: 'blur(5px)'
-        }}>
-          <div style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--surface-border)',
-            borderRadius: '12px',
-            maxWidth: '90%',
-            maxHeight: '90%',
-            width: '800px',
-            position: 'relative',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-          }}>
-            <div style={{
-              padding: '1.2rem 1.5rem',
-              borderBottom: '1px solid var(--surface-border)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Proof of Sales Report</h3>
-                <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  {selectedBook?.title} · {activeProof.month} {activeProof.year} Report
-                </p>
-              </div>
-              <button 
-                onClick={() => setActiveProof(null)}
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: 'none',
-                  color: 'white',
-                  cursor: 'pointer',
-                  padding: '0.5rem',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '1.5rem',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              background: '#090a0f'
-            }}>
-              <img 
-                src={activeProof.proofLink} 
-                alt={`Proof of sales`} 
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '65vh',
-                  objectFit: 'contain',
-                  borderRadius: '6px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-                }}
-              />
-            </div>
-            
-            <div style={{
-              padding: '1rem 1.5rem',
-              borderTop: '1px solid var(--surface-border)',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              background: 'rgba(255,255,255,0.01)'
-            }}>
-              <button 
-                className="btn-primary"
-                onClick={() => setActiveProof(null)}
-                style={{ padding: '0.5rem 1.5rem', borderRadius: '15px' }}
-              >
-                Close View
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
