@@ -45,14 +45,27 @@ export async function GET(req) {
     });
 
     // Sort months chronologically
-    const monthOrder = {
-      'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5,
-      'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11
+    const getMonthVal = (m) => {
+      if (m.includes('January')) return 0;
+      if (m.includes('February')) return 1;
+      if (m.includes('March')) return 2;
+      if (m.includes('April')) return 3;
+      if (m.includes('May')) return 4;
+      if (m.includes('June-July')) return 5.5;
+      if (m.includes('June')) return 5;
+      if (m.includes('July-August')) return 6.5;
+      if (m.includes('July')) return 6;
+      if (m.includes('August')) return 7;
+      if (m.includes('September')) return 8;
+      if (m.includes('October')) return 9;
+      if (m.includes('November')) return 10;
+      if (m.includes('December')) return 11;
+      return 0;
     };
 
     const sortedStats = Object.values(monthlyStatsMap).sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
-      return (monthOrder[a.month] ?? 0) - (monthOrder[b.month] ?? 0);
+      return getMonthVal(a.month) - getMonthVal(b.month);
     });
 
     // Top performing books

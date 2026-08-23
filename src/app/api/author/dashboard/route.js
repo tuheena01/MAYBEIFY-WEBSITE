@@ -64,17 +64,17 @@ export async function GET(req) {
       totalSalesRevenue += b.platformReports.reduce((sum, s) => sum + s.revenue, 0);
     });
 
-    // 5. Royalties total earnings
-    const royalties = await prisma.royalty.findMany({
-      where: { authorId: payload.userId }
-    });
+    // 5. Withdrawal Requests & Transactions
     const transactions = await prisma.transaction.findMany({
       where: { authorId: payload.userId }
     });
+    const withdrawals = await prisma.withdrawalRequest.findMany({
+      where: { authorId: payload.userId }
+    });
     
-    // Total earnings = royalties sum + non-royalty paid transactions sum
-    const totalEarnings = royalties.reduce((sum, r) => sum + r.amount, 0) +
-      transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
+    // Total earnings from sales + non-royalty paid payouts (e.g. referrals)
+    const nonRoyaltyPaid = transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
+    const totalEarnings = totalSalesRevenue + nonRoyaltyPaid;
 
     // 6. Recent Activity
     const activities = [];
@@ -124,6 +124,26 @@ export async function GET(req) {
 
     const finalActivities = activities.slice(0, 5);
 
+    // Compute platform breakdown stats
+    const platformStats = {
+      AMAZON: { name: 'Amazon Store', units: 0, revenue: 0, color: '#2e7d32' },
+      MAYBEIFY: { name: 'Maybeify Direct', units: 0, revenue: 0, color: '#455a64' },
+      KINDLE: { name: 'Amazon Kindle', units: 0, revenue: 0, color: '#c2185b' },
+      PLAYBOOKS: { name: 'Google Playbooks', units: 0, revenue: 0, color: '#f57f17' }
+    };
+
+    books.forEach(b => {
+      b.platformReports.forEach(r => {
+        const platformKey = r.platform.toUpperCase();
+        if (platformStats[platformKey]) {
+          platformStats[platformKey].units += r.unitsSold;
+          platformStats[platformKey].revenue += r.revenue;
+        }
+      });
+    });
+
+    const breakdown = Object.values(platformStats);
+
     return NextResponse.json({
       success: true,
       author: {
@@ -138,7 +158,8 @@ export async function GET(req) {
         totalUnitsSold,
         totalBooks,
         publishedBooks,
-        totalEarnings
+        totalEarnings,
+        breakdown
       },
       activities: finalActivities
     });

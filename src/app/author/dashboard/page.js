@@ -125,6 +125,73 @@ export default function AuthorDashboard() {
         </SpotlightCard>
       </div>
 
+      {/* Platform Sales Performance Graph (Bar Chart Share) */}
+      <SpotlightCard className="glass" style={{ padding: '2rem', marginBottom: '3.5rem' }}>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', marginBottom: '0.8rem', color: 'var(--accent)' }}>
+          Sales Performance by Platform
+        </h2>
+        <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '2rem' }}>
+          Visual share of units sold across your paperback, hardcover, and eBook distribution channels.
+        </p>
+
+        {stats.totalUnitsSold > 0 ? (
+          <div>
+            <div style={{
+              display: 'flex',
+              height: '32px',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              background: 'rgba(255,255,255,0.05)',
+              marginBottom: '2rem',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)'
+            }}>
+              {stats.breakdown.map((plat, i) => {
+                const percent = (plat.units / stats.totalUnitsSold) * 100;
+                if (percent === 0) return null;
+                return (
+                  <div 
+                    key={i} 
+                    style={{
+                      width: `${percent}%`,
+                      background: plat.color,
+                      height: '100%',
+                      transition: 'all 0.4s ease',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'black',
+                      fontWeight: 'bold',
+                      fontSize: '0.8rem'
+                    }}
+                    title={`${plat.name}: ${plat.units} units (${percent.toFixed(1)}%)`}
+                  >
+                    {percent > 8 && `${plat.units} U`}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Platform metrics legend */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
+              {stats.breakdown.map((plat, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--surface-border)', padding: '1rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: plat.color }}></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 'bold', color: 'white', fontSize: '0.9rem' }}>{plat.name}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.2rem' }}>
+                      <strong>{plat.units}</strong> units sold · <strong>₹{plat.revenue.toLocaleString('en-IN')}</strong> royalty
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p style={{ color: '#666', fontStyle: 'italic' }}>No platform sales reports found to render charts.</p>
+        )}
+      </SpotlightCard>
+
       {/* Two Column Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
         

@@ -33,23 +33,32 @@ export async function GET(req) {
       orderBy: { createdAt: 'desc' }
     });
 
-    // Fetch royalties
-    const royalties = await prisma.royalty.findMany({
-      where: { authorId: payload.userId }
+    // Fetch books & sales reports
+    const books = await prisma.book.findMany({
+      where: { authorId: payload.userId },
+      include: { platformReports: true }
     });
 
-    // Calculate cards
-    const totalEarnings = royalties.reduce((sum, r) => sum + r.amount, 0) + 
-      transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
+    let totalSalesRevenue = 0;
+    let thisMonthRevenue = 0;
+    const currentMonthLabels = ['August 2026', 'July-August'];
 
-    const pendingEarnings = royalties.filter(r => r.status === 'PENDING').reduce((sum, r) => sum + r.amount, 0) +
-      transactions.filter(t => t.status === 'PENDING').reduce((sum, t) => sum + t.amount, 0);
+    books.forEach(b => {
+      b.platformReports.forEach(r => {
+        totalSalesRevenue += r.revenue;
+        if (currentMonthLabels.includes(r.month) || r.month.includes('August')) {
+          thisMonthRevenue += r.revenue;
+        }
+      });
+    });
 
-    const paidAmount = royalties.filter(r => r.status === 'PAID').reduce((sum, r) => sum + r.amount, 0) +
-      transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
-
-    const currentMonthLabel = 'August 2026';
-    const thisMonthEarnings = royalties.filter(r => r.month === currentMonthLabel).reduce((sum, r) => sum + r.amount, 0);
+    // Calculate payouts
+    const paidAmount = withdrawals.filter(w => w.status === 'APPROVED').reduce((sum, w) => sum + w.amount, 0);
+    const nonRoyaltyPaid = transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
+    
+    const totalEarnings = totalSalesRevenue + nonRoyaltyPaid;
+    const pendingEarnings = Math.max(0, totalEarnings - paidAmount);
+    const thisMonthEarnings = thisMonthRevenue;
 
     return NextResponse.json({
       success: true,
