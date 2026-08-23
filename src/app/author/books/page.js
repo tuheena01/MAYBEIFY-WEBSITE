@@ -99,7 +99,7 @@ export default function BooksLibrary() {
               </div>
 
               {/* Details */}
-              <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div>
                   <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.2rem', fontFamily: 'var(--font-serif)', lineHeight: '1.3' }}>
                     {book.title}
@@ -107,34 +107,9 @@ export default function BooksLibrary() {
                   <p style={{ margin: 0, color: 'var(--accent)', fontWeight: 'bold', fontSize: '1.05rem', marginBottom: '1rem' }}>
                     ₹{book.price.toFixed(2)}
                   </p>
-                  <p style={{ margin: 0, color: '#aaa', fontSize: '0.85rem', lineHeight: '1.4', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                  <p style={{ margin: 0, color: '#aaa', fontSize: '0.85rem', lineHeight: '1.4', whiteSpace: 'pre-wrap' }}>
                     {book.synopsis || 'No synopsis added for this book.'}
                   </p>
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.5rem' }}>
-                  <Link 
-                    href={`/author/books/${book.id}`} 
-                    className="btn-primary" 
-                    style={{ flex: 1, textAlign: 'center', padding: '0.5rem', borderRadius: '15px', fontSize: '0.85rem' }}
-                  >
-                    View Details
-                  </Link>
-                  <Link 
-                    href={`/author/books/${book.id}#analytics`} 
-                    style={{ 
-                      flex: 1, 
-                      textAlign: 'center', 
-                      padding: '0.5rem', 
-                      borderRadius: '15px', 
-                      fontSize: '0.85rem', 
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid var(--surface-border)',
-                      color: 'white'
-                    }}
-                  >
-                    Analytics
-                  </Link>
                 </div>
               </div>
             </SpotlightCard>
