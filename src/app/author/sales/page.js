@@ -59,117 +59,178 @@ export default function BookSales() {
   // Filter reports for the selected book
   const bookReports = reports.filter(r => r.bookId === selectedBookId);
 
-  // Group report months
-  const months = Array.from(new Set(bookReports.map(r => `${r.month} ${r.year}`)));
-
-  // Build rows matching the horizontal layout structure
-  const spreadsheetRows = months.map(m => {
-    const [monthName, yearStr] = m.split(' ');
-    const yearVal = parseInt(yearStr);
-
-    const amazonReport = bookReports.find(r => r.platform.toUpperCase() === 'AMAZON' && r.month === monthName && r.year === yearVal);
-    const kindleReport = bookReports.find(r => r.platform.toUpperCase() === 'KINDLE' && r.month === monthName && r.year === yearVal);
-    const playbooksReport = bookReports.find(r => r.platform.toUpperCase() === 'PLAYBOOKS' && r.month === monthName && r.year === yearVal);
-    const maybeifyReport = bookReports.find(r => r.platform.toUpperCase() === 'MAYBEIFY' && r.month === monthName && r.year === yearVal);
-
-    // Fallbacks or retrieved database values
-    const mrp = amazonReport?.mrp || kindleReport?.mrp || playbooksReport?.mrp || maybeifyReport?.mrp || selectedBook.price || 299;
-    const printingPrice = amazonReport?.printingCost || maybeifyReport?.printingCost || 85.00;
-    const shippingPrice = amazonReport?.shippingCost || 40.00;
-    const bookCost = mrp;
-
-    const amazonSales = amazonReport?.unitsSold || 0;
-    // Amazon Royalty Formula: Book Cost - Printing Price - Shipping Cost
-    const amazonRoyaltyUnit = bookCost - printingPrice - shippingPrice;
-    const amazonRoyalty = amazonSales * amazonRoyaltyUnit;
-
-    const maybeifySales = maybeifyReport?.unitsSold || 0;
-    const maybeifyRoyalty = maybeifyReport?.revenue || 0.0;
-
-    const googleSales = playbooksReport?.unitsSold || 0;
-    const googleRoyalty = playbooksReport?.revenue || 0.0;
-
-    const kindleSales = kindleReport?.unitsSold || 0;
-    const kindleRoyalty = kindleReport?.revenue || 0.0;
-
-    const cumulativeRoyalty = amazonRoyalty + maybeifyRoyalty + googleRoyalty + kindleRoyalty;
-
-    return {
-      month: m,
-      printingPrice,
-      shippingPrice,
-      bookCost,
-      amazonSales,
-      amazonRoyaltyUnit,
-      amazonRoyalty,
-      maybeifySales,
-      maybeifyRoyalty,
-      googleSales,
-      googleRoyalty,
-      kindleSales,
-      kindleRoyalty,
-      cumulativeRoyalty,
-      proofLink: amazonReport?.screenshot || kindleReport?.screenshot || playbooksReport?.screenshot
-    };
-  });
+  // Group reports by platform
+  const amazonReports = bookReports.filter(r => r.platform.toUpperCase() === 'AMAZON');
+  const maybeifyReports = bookReports.filter(r => r.platform.toUpperCase() === 'MAYBEIFY');
+  const kindleReports = bookReports.filter(r => r.platform.toUpperCase() === 'KINDLE');
+  const playbooksReports = bookReports.filter(r => r.platform.toUpperCase() === 'PLAYBOOKS');
 
   const handleExportCSV = () => {
     if (!selectedBook) return;
 
-    // Headers
     const headers = [
+      'Platform',
       'Printing price',
       'Shipping price',
-      'Amazon Book cost',
+      'Book cost',
       'Month',
-      'Amazon sales',
-      'Amazon Royalty (unit)',
-      'Total Amazon Royalty Earned',
-      'Month',
-      'Maybeify Sales',
-      'Maybeify Royalty earned',
-      'Month',
-      'Google Play Sales',
-      'Google Play Royalty earned',
-      'Month',
-      'Kindle sales',
-      'Kindle Royalty earned',
-      'Total cumulative royalty earned'
+      'Year',
+      'Sales units',
+      'Royalty (unit)',
+      'Total Royalty Earned'
     ];
 
     const csvRows = [headers.join(',')];
 
-    spreadsheetRows.forEach(row => {
-      const dataRow = [
-        row.printingPrice.toFixed(2),
-        row.shippingPrice.toFixed(2),
-        row.bookCost.toFixed(2),
-        `"${row.month}"`,
-        row.amazonSales,
-        row.amazonRoyaltyUnit.toFixed(2),
-        row.amazonRoyalty.toFixed(2),
-        `"${row.month}"`,
-        row.maybeifySales,
-        row.maybeifyRoyalty.toFixed(2),
-        `"${row.month}"`,
-        row.googleSales,
-        row.googleRoyalty.toFixed(2),
-        `"${row.month}"`,
-        row.kindleSales,
-        row.kindleRoyalty.toFixed(2),
-        row.cumulativeRoyalty.toFixed(2)
-      ];
-      csvRows.push(dataRow.join(','));
-    });
+    const compileCsvRows = (platformName, reportsArr, isFormula) => {
+      reportsArr.forEach(r => {
+        const mrp = r.mrp || selectedBook.price || 0.0;
+        const pCost = r.printingCost || 0.0;
+        const sCost = r.shippingCost || 0.0;
+        const royaltyUnit = isFormula ? (mrp - pCost - sCost) : (r.royaltyPerUnit || 0.0);
+        const totalRoyalty = (r.unitsSold || 0) * royaltyUnit;
+
+        const dataRow = [
+          platformName,
+          pCost.toFixed(2),
+          sCost.toFixed(2),
+          mrp.toFixed(2),
+          `"${r.month}"`,
+          r.year,
+          r.unitsSold,
+          royaltyUnit.toFixed(2),
+          totalRoyalty.toFixed(2)
+        ];
+        csvRows.push(dataRow.join(','));
+      });
+    };
+
+    compileCsvRows('Amazon Store', amazonReports, true);
+    compileCsvRows('Maybeify Store', maybeifyReports, true);
+    compileCsvRows('Amazon Kindle', kindleReports, false);
+    compileCsvRows('Google Playbooks', playbooksReports, false);
 
     const csvContent = 'data:text/csv;charset=utf-8,' + csvRows.join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${selectedBook.title.replace(/\s+/g, '_')}_sales_report.csv`);
+    link.setAttribute('download', `${selectedBook.title.replace(/\s+/g, '_')}_stacked_sales_report.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const renderPlatformTable = (title, reportsList, isFormula, colorTheme, labelSales, labelRoyalty) => {
+    return (
+      <SpotlightCard className="glass" style={{ padding: '1.5rem', marginBottom: '2.5rem', border: `1px solid ${colorTheme}33` }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+          <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: colorTheme, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: colorTheme, display: 'inline-block' }}></span>
+            {title}
+          </h3>
+          {isFormula && (
+            <span style={{ fontSize: '0.8rem', color: '#aaa', background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.8rem', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+              Formula: <code>Royalty = Book cost - Printing price - Shipping cost</code>
+            </span>
+          )}
+          {!isFormula && (
+            <span style={{ fontSize: '0.8rem', color: '#aaa', background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.8rem', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+              Standard eBook Royalty format (70% standard)
+            </span>
+          )}
+        </div>
+
+        <div style={{ overflowX: 'auto', background: '#0b0c10', border: '1px solid #2d303a', borderRadius: '8px' }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontFamily: 'monospace, sans-serif',
+            fontSize: '0.82rem',
+            textAlign: 'center',
+            color: '#c9d1d9',
+            minWidth: '1000px'
+          }}>
+            <thead>
+              {/* Excel letters */}
+              <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a' }}>
+                <th style={{ width: '45px', background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}></th>
+                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map((l, idx) => (
+                  <th key={idx} style={{ padding: '0.4rem', borderRight: l !== 'I' ? '1px solid #2d303a' : 'none', color: '#888' }}>{l}</th>
+                ))}
+              </tr>
+              {/* Headers */}
+              <tr style={{ borderBottom: '1px solid #2d303a', fontWeight: 'bold', color: 'white' }}>
+                <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>1</td>
+                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: '#d4af37', color: 'black' }}>Printing price</td>
+                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: '#80cbc4', color: 'black' }}>Shipping cost</td>
+                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: '#e28743', color: 'black' }}>Book cost</td>
+                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Month & Year</td>
+                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>{labelSales}</td>
+                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>Royalty (unit)</td>
+                <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white', fontWeight: 'bold' }}>{labelRoyalty}</td>
+                <td style={{ padding: '0.6rem', background: '#1c1e24' }}>Proof Attachment</td>
+              </tr>
+            </thead>
+            <tbody>
+              {reportsList.length === 0 ? (
+                <tr>
+                  <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
+                  <td colSpan={9} style={{ padding: '2.5rem', color: '#666', fontStyle: 'italic' }}>
+                    No sales reports found for this platform.
+                  </td>
+                </tr>
+              ) : (
+                reportsList.map((row, idx) => {
+                  const rowNum = idx + 2;
+                  const mrp = row.mrp || selectedBook.price || 299;
+                  const printingPrice = row.printingCost || 0.0;
+                  const shippingCost = row.shippingCost || 0.0;
+                  const unitsSold = row.unitsSold || 0;
+
+                  const royaltyUnit = isFormula ? (mrp - printingPrice - shippingCost) : (row.royaltyPerUnit || 0.0);
+                  const totalRoyalty = unitsSold * royaltyUnit;
+
+                  return (
+                    <tr key={idx} style={{ borderBottom: '1px solid #2d303a' }}>
+                      <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold' }}>{rowNum}</td>
+                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a' }}>₹{printingPrice.toFixed(2)}</td>
+                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', color: '#80cbc4' }}>₹{shippingCost.toFixed(2)}</td>
+                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a' }}>₹{mrp.toFixed(2)}</td>
+                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a' }}>{row.month} {row.year}</td>
+                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', fontWeight: 'bold' }}>{unitsSold}</td>
+                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a' }}>₹{royaltyUnit.toFixed(2)}</td>
+                      <td style={{ padding: '0.6rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: colorTheme, background: 'rgba(255,255,255,0.01)' }}>₹{totalRoyalty.toFixed(2)}</td>
+                      <td style={{ padding: '0.6rem' }}>
+                        {row.screenshot ? (
+                          <button
+                            onClick={() => setActiveProof({ ...row, proofLink: row.screenshot })}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: 'var(--accent)',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.3rem',
+                              fontWeight: 'bold',
+                              fontSize: '0.8rem'
+                            }}
+                          >
+                            <Eye size={12} /> View Proof
+                          </button>
+                        ) : (
+                          <span style={{ color: '#555' }}>--</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SpotlightCard>
+    );
   };
 
   return (
@@ -177,8 +238,8 @@ export default function BookSales() {
       {/* Title Banner */}
       <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', margin: 0 }}>Horizontal Sales Ledger</h1>
-          <p style={{ color: '#aaa', marginTop: '0.5rem' }}>View, track, and download structured monthly spreadsheet reports.</p>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', margin: 0 }}>Platform Sales Ledgers</h1>
+          <p style={{ color: '#aaa', marginTop: '0.5rem' }}>View, filter, and download stacked reports for each publishing stream.</p>
         </div>
         {selectedBook && (
           <button 
@@ -194,13 +255,13 @@ export default function BookSales() {
               cursor: 'pointer'
             }}
           >
-            <Download size={18} /> Export to Excel (.csv)
+            <Download size={18} /> Export Stacked Excel (.csv)
           </button>
         )}
       </div>
 
       {/* Book Grid Cards */}
-      <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', marginBottom: '1.5rem' }}>Select Book Library:</h3>
+      <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', marginBottom: '1.5rem' }}>Select Book Library:</h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
         {books.map((book) => {
           const isSelected = book.id === selectedBookId;
@@ -215,12 +276,11 @@ export default function BookSales() {
                 style={{
                   padding: '1.5rem',
                   borderRadius: '12px',
-                  border: isSelected ? '2px solid #217346' : '1px solid var(--surface-border)',
-                  background: isSelected ? 'rgba(33, 115, 70, 0.04)' : 'rgba(255,255,255,0.01)',
+                  border: isSelected ? '2px solid var(--accent)' : '1px solid var(--surface-border)',
+                  background: isSelected ? 'rgba(212, 175, 55, 0.02)' : 'rgba(255,255,255,0.01)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '1.2rem',
-                  boxShadow: isSelected ? '0 8px 24px rgba(33, 115, 70, 0.15)' : 'none',
                   transition: 'all 0.3s ease'
                 }}
               >
@@ -228,11 +288,11 @@ export default function BookSales() {
                   width: '50px', 
                   height: '50px', 
                   borderRadius: '8px', 
-                  background: isSelected ? '#217346' : 'rgba(255,255,255,0.05)', 
+                  background: isSelected ? 'var(--accent)' : 'rgba(255,255,255,0.05)', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
-                  color: isSelected ? 'white' : '#888'
+                  color: isSelected ? 'black' : '#888'
                 }}>
                   <BookOpen size={24} />
                 </div>
@@ -241,7 +301,7 @@ export default function BookSales() {
                     {book.title}
                   </h4>
                   <span style={{ fontSize: '0.85rem', color: isSelected ? 'var(--accent)' : '#888', fontWeight: 'bold' }}>
-                    Click to load sheet
+                    Click to load platform sheets
                   </span>
                 </div>
               </SpotlightCard>
@@ -250,159 +310,21 @@ export default function BookSales() {
         })}
       </div>
 
-      {/* Spreadsheet Presentation Section */}
+      {/* Spreadsheet Tables */}
       {selectedBook ? (
         <div>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            Spreadsheet: <span style={{ color: 'var(--accent)' }}>"{selectedBook.title}"</span>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '2.5rem' }}>
+            Book Sales Spreadsheets: <span style={{ color: 'var(--accent)' }}>"{selectedBook.title}"</span>
           </h2>
 
-          <div className="glass" style={{ 
-            padding: '1rem 1.5rem', 
-            borderRadius: '8px', 
-            marginBottom: '2rem', 
-            background: 'rgba(33, 115, 70, 0.05)', 
-            border: '1px dashed rgba(33, 115, 70, 0.3)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '0.8rem' 
-          }}>
-            <span style={{ fontSize: '1.2rem' }}>💡</span>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: '#ccc' }}>
-              <strong>Amazon Royalty Formula:</strong> <code>Royalty per Unit = Amazon Book Cost - (Printing price + Shipping cost)</code>
-            </p>
-          </div>
-
-          <div style={{ overflowX: 'auto', background: '#0b0c10', border: '1px solid #2d303a', borderRadius: '8px' }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontFamily: 'monospace, sans-serif',
-              fontSize: '0.82rem',
-              textAlign: 'center',
-              color: '#c9d1d9',
-              minWidth: '1350px'
-            }}>
-              <thead>
-                {/* Excel Column Letters row */}
-                <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a' }}>
-                  <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}></th>
-                  {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'].map((letter, i) => (
-                    <th key={i} style={{ padding: '0.4rem', borderRight: letter !== 'S' ? '1px solid #2d303a' : 'none', color: '#888' }}>{letter}</th>
-                  ))}
-                </tr>
-                {/* Excel Colored Headers row */}
-                <tr style={{ borderBottom: '1px solid #2d303a', fontWeight: 'bold', fontSize: '0.85rem', color: '#fff' }}>
-                  <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>1</td>
-                  {/* General cost columns */}
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#d4af37', color: 'black' }}>Printing price</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#80cbc4', color: 'black' }}>Shipping cost</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#e28743', color: 'black' }}>Amazon Book cost</td>
-                  {/* Amazon store columns */}
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Month</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon sales</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Royalty (unit)</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32', fontWeight: 'bold' }}>Total Amazon Royalty Earned</td>
-                  {/* Maybeify columns */}
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Month</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Sales</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Royalty earned</td>
-                  {/* Spacer Col I */}
-                  <td style={{ width: '20px', borderRight: '1px solid #2d303a', background: '#14161b' }}></td>
-                  {/* Google Playbooks columns */}
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#f57f17', color: 'black' }}>Month</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#f57f17', color: 'black' }}>Google Play Sales</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#f57f17', color: 'black' }}>Royalty earned</td>
-                  {/* Amazon Kindle columns */}
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#c2185b' }}>Month</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#c2185b' }}>Kindle sales</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#c2185b' }}>Royalty earned</td>
-                  {/* Cumulative total column */}
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#b71c1c', fontWeight: 'bold' }}>Total cumulative royalty earned</td>
-                  <td style={{ padding: '0.8rem', background: '#1c1e24' }}>Proof Attachment</td>
-                </tr>
-              </thead>
-              <tbody>
-                {spreadsheetRows.length === 0 ? (
-                  <tr>
-                    <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                    <td colSpan={19} style={{ padding: '3rem', color: '#666', fontStyle: 'italic' }}>
-                      No reports found for this book.
-                    </td>
-                  </tr>
-                ) : (
-                  spreadsheetRows.map((row, idx) => {
-                    const rowNum = idx + 2;
-                    return (
-                      <tr key={idx} style={{ borderBottom: '1px solid #2d303a' }}>
-                        <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold' }}>{rowNum}</td>
-                        {/* Costs */}
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold' }}>₹{row.printingPrice.toFixed(2)}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#80cbc4' }}>₹{row.shippingPrice.toFixed(2)}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>₹{row.bookCost.toFixed(2)}</td>
-                        {/* Amazon Store */}
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#81c784' }}>{row.month}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>{row.amazonSales}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#81c784' }}>₹{row.amazonRoyaltyUnit.toFixed(2)}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#81c784', background: 'rgba(46, 125, 50, 0.04)' }}>₹{row.amazonRoyalty.toFixed(2)}</td>
-                        {/* Maybeify direct */}
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#90a4ae' }}>{row.month}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>{row.maybeifySales}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#90a4ae' }}>₹{row.maybeifyRoyalty.toFixed(2)}</td>
-                        {/* Blank Spacer Col I */}
-                        <td style={{ borderRight: '1px solid #2d303a', background: '#14161b' }}></td>
-                        {/* Google Playbooks */}
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#ffd54f' }}>{row.month}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>{row.googleSales}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#ffd54f' }}>₹{row.googleRoyalty.toFixed(2)}</td>
-                        {/* Kindle */}
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#f48fb1' }}>{row.month}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>{row.kindleSales}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#f48fb1' }}>₹{row.kindleRoyalty.toFixed(2)}</td>
-                        {/* Total Cumulative */}
-                        <td style={{ 
-                          padding: '0.8rem', 
-                          borderRight: '1px solid #2d303a', 
-                          fontWeight: 'bold', 
-                          color: '#e57373', 
-                          background: 'rgba(183, 28, 28, 0.08)' 
-                        }}>
-                          ₹{row.cumulativeRoyalty.toFixed(2)}
-                        </td>
-                        {/* Screenshot Link */}
-                        <td style={{ padding: '0.8rem' }}>
-                          {row.proofLink ? (
-                            <button
-                              onClick={() => setActiveProof(row)}
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--accent)',
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.3rem',
-                                fontWeight: 'bold',
-                                fontSize: '0.8rem'
-                              }}
-                            >
-                              <Eye size={12} /> View Proof
-                            </button>
-                          ) : (
-                            <span style={{ color: '#555' }}>--</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+          {renderPlatformTable('Amazon Store (Paperback/Hardcover)', amazonReports, true, '#2e7d32', 'Amazon Sales', 'Total Amazon Royalty')}
+          {renderPlatformTable('Maybeify Direct Store', maybeifyReports, true, '#455a64', 'Maybeify Sales', 'Total Maybeify Royalty')}
+          {renderPlatformTable('Amazon Kindle eBook Store', kindleReports, false, '#c2185b', 'Kindle Sales', 'Total Kindle Royalty')}
+          {renderPlatformTable('Google Playbooks eBook Store', playbooksReports, false, '#f57f17', 'Google Sales', 'Total Google Royalty')}
         </div>
       ) : (
         <div className="glass" style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>
-          Select a book card above to load sales spreadsheets.
+          Select a book card above to load platform sales spreadsheets.
         </div>
       )}
 
@@ -445,7 +367,7 @@ export default function BookSales() {
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Proof of Sales Report</h3>
                 <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  {selectedBook?.title} · {activeProof.month} Report
+                  {selectedBook?.title} · {activeProof.month} {activeProof.year} Report
                 </p>
               </div>
               <button 

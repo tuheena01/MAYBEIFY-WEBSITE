@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './Admin.module.css';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
-import { Save, Plus, FileSpreadsheet, Edit3, Trash2 } from 'lucide-react';
+import { Save, Plus, Trash2 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [apps, setApps] = useState([]);
@@ -35,8 +35,11 @@ export default function AdminDashboard() {
   const [newBookSynopsis, setNewBookSynopsis] = useState('');
   const [bookMessage, setBookMessage] = useState('');
 
-  // Interactive horizontal spreadsheet state
-  const [spreadsheetRows, setSpreadsheetRows] = useState([]);
+  // Stacked spreadsheets state
+  const [amazonRows, setAmazonRows] = useState([]);
+  const [maybeifyRows, setMaybeifyRows] = useState([]);
+  const [kindleRows, setKindleRows] = useState([]);
+  const [googleRows, setGoogleRows] = useState([]);
   const [sheetMessage, setSheetMessage] = useState('');
 
   const fetchAdminData = () => {
@@ -90,59 +93,39 @@ export default function AdminDashboard() {
     }
   }, [selectedAuthorId, authors]);
 
-  // Reset selected book only when selectedAuthorId actually changes
+  // Reset selected book when author ID changes
   useEffect(() => {
     setSelectedBookId('');
-    setSpreadsheetRows([]);
+    setAmazonRows([]);
+    setMaybeifyRows([]);
+    setKindleRows([]);
+    setGoogleRows([]);
   }, [selectedAuthorId]);
 
-  // Load spreadsheet rows when book changes
+  // Load platform-specific spreadsheet rows when book changes
   useEffect(() => {
     if (selectedBookId && selectedAuthorId) {
       const author = authors.find(a => a.id === selectedAuthorId);
       const book = author?.books?.find(b => b.id === selectedBookId);
       
       if (book && book.platformReports) {
-        // Group reports by Month & Year to build horizontal row entities
         const bookReports = book.platformReports;
-        const months = Array.from(new Set(bookReports.map(r => `${r.month} ${r.year}`)));
         
-        const rows = months.map(m => {
-          const [monthName, yearStr] = m.split(' ');
-          const yearVal = parseInt(yearStr);
-
-          const amz = bookReports.find(r => r.platform.toUpperCase() === 'AMAZON' && r.month === monthName && r.year === yearVal);
-          const kdl = bookReports.find(r => r.platform.toUpperCase() === 'KINDLE' && r.month === monthName && r.year === yearVal);
-          const pb = bookReports.find(r => r.platform.toUpperCase() === 'PLAYBOOKS' && r.month === monthName && r.year === yearVal);
-          const mbf = bookReports.find(r => r.platform.toUpperCase() === 'MAYBEIFY' && r.month === monthName && r.year === yearVal);
-
-          const mrp = amz?.mrp || kdl?.mrp || pb?.mrp || mbf?.mrp || book.price || 299;
-          const printingPrice = amz?.printingCost || mbf?.printingCost || 85.00;
-          const shippingCost = amz?.shippingCost || 40.00;
-
-          return {
-            month: monthName,
-            year: yearVal,
-            printingPrice,
-            shippingCost,
-            bookCost: mrp,
-            amazonSales: amz?.unitsSold || 0,
-            amazonRoyaltyPerUnit: amz?.royaltyPerUnit || (mrp - printingPrice - shippingCost),
-            maybeifySales: mbf?.unitsSold || 0,
-            maybeifyRoyaltyPerUnit: mbf?.royaltyPerUnit || 0.0,
-            googleSales: pb?.unitsSold || 0,
-            googleRoyaltyPerUnit: pb?.royaltyPerUnit || 55.00,
-            kindleSales: kdl?.unitsSold || 0,
-            kindleRoyaltyPerUnit: kdl?.royaltyPerUnit || 45.00,
-            screenshot: amz?.screenshot || kdl?.screenshot || pb?.screenshot || mbf?.screenshot || ''
-          };
-        });
-        setSpreadsheetRows(rows);
+        setAmazonRows(bookReports.filter(r => r.platform.toUpperCase() === 'AMAZON'));
+        setMaybeifyRows(bookReports.filter(r => r.platform.toUpperCase() === 'MAYBEIFY'));
+        setKindleRows(bookReports.filter(r => r.platform.toUpperCase() === 'KINDLE'));
+        setGoogleRows(bookReports.filter(r => r.platform.toUpperCase() === 'PLAYBOOKS'));
       } else {
-        setSpreadsheetRows([]);
+        setAmazonRows([]);
+        setMaybeifyRows([]);
+        setKindleRows([]);
+        setGoogleRows([]);
       }
     } else {
-      setSpreadsheetRows([]);
+      setAmazonRows([]);
+      setMaybeifyRows([]);
+      setKindleRows([]);
+      setGoogleRows([]);
     }
   }, [selectedBookId, selectedAuthorId, authors]);
 
@@ -216,103 +199,135 @@ export default function AdminDashboard() {
     }
   };
 
-  // Add Row to horizontal spreadsheet editor
-  const handleAddSheetRow = () => {
+  // Grid Row Add / Delete / Change Actions
+  const handleAddRow = (platform) => {
+    const author = authors.find(a => a.id === selectedAuthorId);
+    const book = author?.books?.find(b => b.id === selectedBookId);
+    const defaultPrice = book?.price || 299.0;
+
     const newRow = {
-      month: 'September',
+      month: 'August',
       year: 2026,
-      printingPrice: 85.0,
-      shippingCost: 40.0,
-      bookCost: 299.0,
-      amazonSales: 0,
-      amazonRoyaltyPerUnit: 174.0, // calculated from bookCost - printingPrice - shippingCost
-      maybeifySales: 0,
-      maybeifyRoyaltyPerUnit: 0.0,
-      googleSales: 0,
-      googleRoyaltyPerUnit: 55.0,
-      kindleSales: 0,
-      kindleRoyaltyPerUnit: 45.0,
+      printingCost: platform === 'AMAZON' || platform === 'MAYBEIFY' ? 208.0 : 0.0,
+      shippingCost: platform === 'AMAZON' || platform === 'MAYBEIFY' ? 33.0 : 0.0,
+      mrp: defaultPrice,
+      unitsSold: 0,
+      royaltyPerUnit: platform === 'KINDLE' || platform === 'PLAYBOOKS' ? (defaultPrice * 0.70) : 0.0,
       screenshot: ''
     };
-    setSpreadsheetRows([...spreadsheetRows, newRow]);
+
+    if (platform === 'AMAZON') setAmazonRows([...amazonRows, newRow]);
+    else if (platform === 'MAYBEIFY') setMaybeifyRows([...maybeifyRows, newRow]);
+    else if (platform === 'KINDLE') setKindleRows([...kindleRows, newRow]);
+    else if (platform === 'PLAYBOOKS') setGoogleRows([...googleRows, newRow]);
   };
 
-  // Row cell editing
-  const handleCellChange = (index, field, value) => {
-    const updated = [...spreadsheetRows];
+  const handleDeleteRow = (platform, index) => {
+    if (platform === 'AMAZON') setAmazonRows(amazonRows.filter((_, i) => i !== index));
+    else if (platform === 'MAYBEIFY') setMaybeifyRows(maybeifyRows.filter((_, i) => i !== index));
+    else if (platform === 'KINDLE') setKindleRows(kindleRows.filter((_, i) => i !== index));
+    else if (platform === 'PLAYBOOKS') setGoogleRows(googleRows.filter((_, i) => i !== index));
+  };
+
+  const handleCellChange = (platform, index, field, value) => {
+    let targetRows, setTargetRows;
+    if (platform === 'AMAZON') { targetRows = amazonRows; setTargetRows = setAmazonRows; }
+    else if (platform === 'MAYBEIFY') { targetRows = maybeifyRows; setTargetRows = setMaybeifyRows; }
+    else if (platform === 'KINDLE') { targetRows = kindleRows; setTargetRows = setKindleRows; }
+    else if (platform === 'PLAYBOOKS') { targetRows = googleRows; setTargetRows = setGoogleRows; }
+
+    const updated = [...targetRows];
     updated[index][field] = value;
-    setSpreadsheetRows(updated);
+    setTargetRows(updated);
   };
 
-  // Delete row
-  const handleDeleteSheetRow = (index) => {
-    setSpreadsheetRows(spreadsheetRows.filter((_, i) => i !== index));
-  };
-
-  // Save spreadsheet grid rows
-  const handleSaveSpreadsheet = async () => {
+  // Batch Save all 4 grids
+  const handleSaveSpreadsheets = async () => {
     if (!selectedBookId) return;
-    setSheetMessage('Compiling and saving grid...');
+    setSheetMessage('Compiling and saving spreadsheets...');
 
-    // Compile horizontal rows to platform reports list
     const reportsList = [];
-    spreadsheetRows.forEach(row => {
-      const pPrice = parseFloat(row.printingPrice) || 0.0;
-      const sCost = parseFloat(row.shippingCost) || 0.0;
-      const bCost = parseFloat(row.bookCost) || 0.0;
-      const amzSales = parseInt(row.amazonSales) || 0;
-      const amzRoyaltyPerUnit = bCost - pPrice - sCost;
 
-      // Amazon
+    // 1. Amazon
+    amazonRows.forEach(row => {
+      const pCost = parseFloat(row.printingCost) || 0.0;
+      const sCost = parseFloat(row.shippingCost) || 0.0;
+      const mrp = parseFloat(row.mrp) || 0.0;
+      const units = parseInt(row.unitsSold) || 0;
+      const royaltyUnit = mrp - pCost - sCost; // formula!
+
       reportsList.push({
         platform: 'AMAZON',
         month: row.month,
         year: parseInt(row.year) || 2026,
-        mrp: bCost,
-        printingCost: pPrice,
+        mrp,
+        printingCost: pCost,
         shippingCost: sCost,
-        royaltyPerUnit: amzRoyaltyPerUnit,
-        unitsSold: amzSales,
-        revenue: amzSales * amzRoyaltyPerUnit,
+        royaltyPerUnit: royaltyUnit,
+        unitsSold: units,
+        revenue: units * royaltyUnit,
         screenshot: row.screenshot || null
       });
-      // Maybeify
+    });
+
+    // 2. Maybeify
+    maybeifyRows.forEach(row => {
+      const pCost = parseFloat(row.printingCost) || 0.0;
+      const sCost = parseFloat(row.shippingCost) || 0.0;
+      const mrp = parseFloat(row.mrp) || 0.0;
+      const units = parseInt(row.unitsSold) || 0;
+      const royaltyUnit = mrp - pCost - sCost; // formula!
+
       reportsList.push({
         platform: 'MAYBEIFY',
         month: row.month,
         year: parseInt(row.year) || 2026,
-        mrp: parseFloat(row.bookCost) || 0.0,
-        printingCost: parseFloat(row.printingPrice) || 0.0,
-        shippingCost: 0.00,
-        royaltyPerUnit: parseFloat(row.maybeifyRoyaltyPerUnit) || 0.0,
-        unitsSold: parseInt(row.maybeifySales) || 0,
-        revenue: (parseInt(row.maybeifySales) || 0) * (parseFloat(row.maybeifyRoyaltyPerUnit) || 0.0),
+        mrp,
+        printingCost: pCost,
+        shippingCost: sCost,
+        royaltyPerUnit: royaltyUnit,
+        unitsSold: units,
+        revenue: units * royaltyUnit,
         screenshot: row.screenshot || null
       });
-      // Playbooks
-      reportsList.push({
-        platform: 'PLAYBOOKS',
-        month: row.month,
-        year: parseInt(row.year) || 2026,
-        mrp: parseFloat(row.bookCost) || 0.0,
-        printingCost: 0.0,
-        shippingCost: 0.0,
-        royaltyPerUnit: parseFloat(row.googleRoyaltyPerUnit) || 0.0,
-        unitsSold: parseInt(row.googleSales) || 0,
-        revenue: (parseInt(row.googleSales) || 0) * (parseFloat(row.googleRoyaltyPerUnit) || 0.0),
-        screenshot: row.screenshot || null
-      });
-      // Kindle
+    });
+
+    // 3. Kindle
+    kindleRows.forEach(row => {
+      const mrp = parseFloat(row.mrp) || 0.0;
+      const units = parseInt(row.unitsSold) || 0;
+      const royaltyUnit = parseFloat(row.royaltyPerUnit) !== undefined ? parseFloat(row.royaltyPerUnit) : (mrp * 0.70);
+
       reportsList.push({
         platform: 'KINDLE',
         month: row.month,
         year: parseInt(row.year) || 2026,
-        mrp: parseFloat(row.bookCost) || 0.0,
+        mrp,
         printingCost: 0.0,
         shippingCost: 0.0,
-        royaltyPerUnit: parseFloat(row.kindleRoyaltyPerUnit) || 0.0,
-        unitsSold: parseInt(row.kindleSales) || 0,
-        revenue: (parseInt(row.kindleSales) || 0) * (parseFloat(row.kindleRoyaltyPerUnit) || 0.0),
+        royaltyPerUnit: royaltyUnit,
+        unitsSold: units,
+        revenue: units * royaltyUnit,
+        screenshot: row.screenshot || null
+      });
+    });
+
+    // 4. Google Playbooks
+    googleRows.forEach(row => {
+      const mrp = parseFloat(row.mrp) || 0.0;
+      const units = parseInt(row.unitsSold) || 0;
+      const royaltyUnit = parseFloat(row.royaltyPerUnit) !== undefined ? parseFloat(row.royaltyPerUnit) : (mrp * 0.70);
+
+      reportsList.push({
+        platform: 'PLAYBOOKS',
+        month: row.month,
+        year: parseInt(row.year) || 2026,
+        mrp,
+        printingCost: 0.0,
+        shippingCost: 0.0,
+        royaltyPerUnit: royaltyUnit,
+        unitsSold: units,
+        revenue: units * royaltyUnit,
         screenshot: row.screenshot || null
       });
     });
@@ -328,7 +343,7 @@ export default function AdminDashboard() {
         })
       });
       if (res.ok) {
-        setSheetMessage('Excel Sales spreadsheet saved successfully to DB!');
+        setSheetMessage('All platform spreadsheets saved successfully to DB!');
         fetchAdminData();
       } else {
         const err = await res.json();
@@ -339,7 +354,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // Approve/Reject withdrawal
+  // Resolve withdrawal
   const handleResolveWithdrawal = async (id, status) => {
     if (!confirm(`Resolve this withdrawal request as ${status}?`)) return;
     try {
@@ -361,6 +376,202 @@ export default function AdminDashboard() {
 
   const selectedAuthorObj = authors.find(a => a.id === selectedAuthorId);
   const authorBooks = selectedAuthorObj ? selectedAuthorObj.books : [];
+
+  const renderAdminPlatformTable = (title, platform, rows, isFormula, colorTheme, labelSales, labelRoyalty) => {
+    return (
+      <div style={{ marginBottom: '3rem', background: '#0b0c10', padding: '1.5rem', borderRadius: '12px', border: `1px solid ${colorTheme}22` }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+          <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: '1.3rem', color: colorTheme, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: colorTheme }}></span>
+            {title}
+          </h3>
+          <button 
+            onClick={() => handleAddRow(platform)}
+            style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: `1px solid ${colorTheme}55`,
+              color: colorTheme,
+              padding: '0.4rem 1rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              fontSize: '0.8rem',
+              fontWeight: 'bold'
+            }}
+          >
+            <Plus size={14} /> Add Row
+          </button>
+        </div>
+
+        <div style={{ overflowX: 'auto', border: '1px solid #2d303a', borderRadius: '8px' }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontFamily: 'monospace, sans-serif',
+            fontSize: '0.8rem',
+            color: '#c9d1d9',
+            minWidth: '1200px'
+          }}>
+            <thead>
+              {/* Alphabet row */}
+              <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a', textAlign: 'center' }}>
+                <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a' }}></th>
+                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map((l, i) => (
+                  <th key={i} style={{ padding: '0.3rem', borderRight: '1px solid #2d303a', color: '#888' }}>{l}</th>
+                ))}
+                <th style={{ width: '60px' }}>Actions</th>
+              </tr>
+              {/* Colored headers */}
+              <tr style={{ borderBottom: '1px solid #2d303a', fontWeight: 'bold', textAlign: 'center', color: 'white' }}>
+                <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>1</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#d4af37', color: 'black' }}>Printing price</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#80cbc4', color: 'black' }}>Shipping cost</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#e28743', color: 'black' }}>Book cost</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Month</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Year</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>{labelSales}</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white' }}>Royalty (unit)</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: colorTheme, color: colorTheme === '#f57f17' ? 'black' : 'white', fontWeight: 'bold' }}>{labelRoyalty}</td>
+                <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Screenshot Proof URL</td>
+                <td style={{ background: '#1c1e24' }}></td>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.length === 0 ? (
+                <tr>
+                  <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
+                  <td colSpan={10} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                    No rows configured for {title}. Click "Add Row" to initialize.
+                  </td>
+                </tr>
+              ) : (
+                rows.map((row, idx) => {
+                  const rowNum = idx + 2;
+                  const mrp = parseFloat(row.mrp) || 0.0;
+                  const printingPrice = parseFloat(row.printingCost) || 0.0;
+                  const shippingCost = parseFloat(row.shippingCost) || 0.0;
+                  const unitsSold = parseInt(row.unitsSold) || 0;
+
+                  const royaltyUnit = isFormula ? (mrp - printingPrice - shippingCost) : (parseFloat(row.royaltyPerUnit) || 0.0);
+                  const totalRoyalty = unitsSold * royaltyUnit;
+
+                  return (
+                    <tr key={idx} style={{ borderBottom: '1px solid #2d303a' }}>
+                      <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold', textAlign: 'center' }}>{rowNum}</td>
+                      
+                      {/* Printing Price */}
+                      <td style={{ borderRight: '1px solid #2d303a' }}>
+                        <input 
+                          type="number" 
+                          value={row.printingCost} 
+                          onChange={(e) => handleCellChange(platform, idx, 'printingCost', parseFloat(e.target.value) || 0.0)} 
+                          style={{ width: '85px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                          disabled={!isFormula}
+                        />
+                      </td>
+
+                      {/* Shipping Cost */}
+                      <td style={{ borderRight: '1px solid #2d303a' }}>
+                        <input 
+                          type="number" 
+                          value={row.shippingCost} 
+                          onChange={(e) => handleCellChange(platform, idx, 'shippingCost', parseFloat(e.target.value) || 0.0)} 
+                          style={{ width: '85px', border: 'none', background: 'transparent', color: '#80cbc4', fontWeight: 'bold', textAlign: 'center', outline: 'none' }}
+                          disabled={!isFormula}
+                        />
+                      </td>
+
+                      {/* Book Cost */}
+                      <td style={{ borderRight: '1px solid #2d303a' }}>
+                        <input 
+                          type="number" 
+                          value={row.mrp} 
+                          onChange={(e) => handleCellChange(platform, idx, 'mrp', parseFloat(e.target.value) || 0.0)} 
+                          style={{ width: '85px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                        />
+                      </td>
+
+                      {/* Month */}
+                      <td style={{ borderRight: '1px solid #2d303a' }}>
+                        <input 
+                          type="text" 
+                          value={row.month} 
+                          onChange={(e) => handleCellChange(platform, idx, 'month', e.target.value)} 
+                          style={{ width: '100px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                        />
+                      </td>
+
+                      {/* Year */}
+                      <td style={{ borderRight: '1px solid #2d303a' }}>
+                        <input 
+                          type="number" 
+                          value={row.year} 
+                          onChange={(e) => handleCellChange(platform, idx, 'year', parseInt(e.target.value) || 2026)} 
+                          style={{ width: '60px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                        />
+                      </td>
+
+                      {/* Platform Sales */}
+                      <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(255,255,255,0.01)' }}>
+                        <input 
+                          type="number" 
+                          value={row.unitsSold} 
+                          onChange={(e) => handleCellChange(platform, idx, 'unitsSold', parseInt(e.target.value) || 0)} 
+                          style={{ width: '65px', border: 'none', background: 'transparent', color: colorTheme, textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
+                        />
+                      </td>
+
+                      {/* Royalty per unit (LOCKED for Formula, EDITABLE for eBook) */}
+                      <td style={{ borderRight: '1px solid #2d303a', background: isFormula ? 'rgba(255,255,255,0.03)' : 'transparent', color: colorTheme }}>
+                        {isFormula ? (
+                          <div style={{ textAlign: 'center', fontWeight: 'bold' }}>₹{royaltyUnit.toFixed(2)}</div>
+                        ) : (
+                          <input 
+                            type="number" 
+                            value={row.royaltyPerUnit} 
+                            onChange={(e) => handleCellChange(platform, idx, 'royaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
+                            style={{ width: '70px', border: 'none', background: 'transparent', color: colorTheme, textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
+                          />
+                        )}
+                      </td>
+
+                      {/* Total Royalty */}
+                      <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(255, 255, 255, 0.04)', textAlign: 'center', color: colorTheme, fontWeight: 'bold' }}>
+                        ₹{totalRoyalty.toFixed(2)}
+                      </td>
+
+                      {/* Screenshot URL */}
+                      <td style={{ borderRight: '1px solid #2d303a' }}>
+                        <input 
+                          type="text" 
+                          value={row.screenshot || ''} 
+                          onChange={(e) => handleCellChange(platform, idx, 'screenshot', e.target.value)} 
+                          placeholder="URL Link"
+                          style={{ width: '140px', border: 'none', background: 'transparent', color: '#aaa', outline: 'none', fontSize: '0.75rem' }}
+                        />
+                      </td>
+
+                      {/* Actions Delete */}
+                      <td style={{ textAlign: 'center' }}>
+                        <button 
+                          onClick={() => handleDeleteRow(platform, idx)}
+                          style={{ background: 'transparent', border: 'none', color: '#FF4B4B', cursor: 'pointer' }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
 
   if (loading) return <div className={styles.container}>Loading administration console...</div>;
 
@@ -567,18 +778,19 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* ── SECTION: INTERACTIVE HORIZONTAL EXCEL SPREADSHEET EDITOR ── */}
+      {/* ── SECTION: INTERACTIVE STACKED SPREADSHEETS EDITOR ── */}
       {selectedAuthorId && (
         <SpotlightCard className="glass" style={{ padding: '2rem', marginBottom: '4rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1.5rem' }}>
             <div>
-              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', margin: 0, color: 'var(--accent)' }}>
-                Spreadsheet Grid Editor
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.7rem', margin: 0, color: 'var(--accent)' }}>
+                Spreadsheet Grid Editors
               </h2>
-              <p style={{ color: '#aaa', margin: '0.2rem 0 0', fontSize: '0.85rem' }}>Edit the horizontal sales sheet values directly inside cells. Save spreadsheet once completed.</p>
+              <p style={{ color: '#aaa', margin: '0.2rem 0 0', fontSize: '0.85rem' }}>Edit platform-specific Excel grids vertically. Click "Save Sales Spreadsheets" at the bottom to sync all.</p>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <label style={{ fontSize: '0.9rem', color: '#888' }}>Target Book:</label>
               <select 
                 value={selectedBookId} 
                 onChange={(e) => setSelectedBookId(e.target.value)}
@@ -598,273 +810,42 @@ export default function AdminDashboard() {
                   <option key={b.id} value={b.id}>{b.title}</option>
                 ))}
               </select>
-
-              {selectedBookId && (
-                <>
-                  <button 
-                    onClick={handleAddSheetRow}
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      color: 'white',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.3rem',
-                      fontSize: '0.85rem'
-                    }}
-                  >
-                    <Plus size={14} /> Add Row
-                  </button>
-
-                  <button 
-                    onClick={handleSaveSpreadsheet}
-                    className="btn-primary"
-                    style={{
-                      padding: '0.5rem 1.2rem',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.3rem',
-                      fontSize: '0.85rem',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    <Save size={14} /> Save Sales Spreadsheet
-                  </button>
-                </>
-              )}
             </div>
           </div>
 
           {selectedBookId ? (
-            <div style={{ overflowX: 'auto', border: '1px solid #2d303a', borderRadius: '8px' }}>
-              <table style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                fontFamily: 'monospace, sans-serif',
-                fontSize: '0.8rem',
-                color: '#c9d1d9',
-                minWidth: '1600px'
-              }}>
-                <thead>
-                  {/* Alphabet excel row */}
-                  <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a', textAlign: 'center' }}>
-                    <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a' }}></th>
-                    {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'].map((l, i) => (
-                      <th key={i} style={{ padding: '0.3rem', borderRight: '1px solid #2d303a', color: '#888' }}>{l}</th>
-                    ))}
-                    <th style={{ width: '60px' }}>Actions</th>
-                  </tr>
-                  {/* Excel headers */}
-                  <tr style={{ borderBottom: '1px solid #2d303a', fontWeight: 'bold', textAlign: 'center', color: 'white' }}>
-                    <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>1</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#d4af37', color: 'black' }}>Printing price</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#80cbc4', color: 'black' }}>Shipping cost</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#e28743', color: 'black' }}>Book cost</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Month</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Year</td>
-                    {/* Amazon */}
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Sales</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Royalty (unit)</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32', fontWeight: 'bold' }}>Total Amazon Royalty</td>
-                    {/* Maybeify */}
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Sales</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Royalty (unit)</td>
-                    {/* Google Playbooks */}
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#f57f17', color: 'black' }}>Google Sales</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#f57f17', color: 'black' }}>Google Royalty (unit)</td>
-                    {/* Kindle */}
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#c2185b' }}>Kindle Sales</td>
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#c2185b' }}>Kindle Royalty (unit)</td>
-                    
-                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Screenshot proof URL</td>
-                    <td style={{ background: '#1c1e24' }}></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  {spreadsheetRows.length === 0 ? (
-                    <tr>
-                      <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                      <td colSpan={17} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
-                        No spreadsheet rows. Click "Add Row" to initialize.
-                      </td>
-                    </tr>
-                  ) : (
-                    spreadsheetRows.map((row, idx) => {
-                      const rowNum = idx + 2;
-                      const calculatedAmzRoyalty = row.bookCost - row.printingPrice - row.shippingCost;
-                      const calculatedAmzTotal = row.amazonSales * calculatedAmzRoyalty;
-                      return (
-                        <tr key={idx} style={{ borderBottom: '1px solid #2d303a' }}>
-                          <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold', textAlign: 'center' }}>{rowNum}</td>
-                          
-                          {/* Printing price */}
-                          <td style={{ borderRight: '1px solid #2d303a' }}>
-                            <input 
-                              type="number" 
-                              value={row.printingPrice} 
-                              onChange={(e) => handleCellChange(idx, 'printingPrice', parseFloat(e.target.value) || 0.0)} 
-                              style={{ width: '80px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
+            <div>
+              {renderAdminPlatformTable('1. Amazon Store (Paperback/Hardcover)', 'AMAZON', amazonRows, true, '#2e7d32', 'Amazon Sales', 'Total Amazon Royalty')}
+              {renderAdminPlatformTable('2. Maybeify Direct Store', 'MAYBEIFY', maybeifyRows, true, '#455a64', 'Maybeify Sales', 'Total Maybeify Royalty')}
+              {renderAdminPlatformTable('3. Amazon Kindle eBook Store', 'KINDLE', kindleRows, false, '#c2185b', 'Kindle Sales', 'Total Kindle Royalty')}
+              {renderAdminPlatformTable('4. Google Playbooks eBook Store', 'PLAYBOOKS', googleRows, false, '#f57f17', 'Google Sales', 'Total Google Royalty')}
 
-                          {/* Shipping cost */}
-                          <td style={{ borderRight: '1px solid #2d303a' }}>
-                            <input 
-                              type="number" 
-                              value={row.shippingCost} 
-                              onChange={(e) => handleCellChange(idx, 'shippingCost', parseFloat(e.target.value) || 0.0)} 
-                              style={{ width: '80px', border: 'none', background: 'transparent', color: '#80cbc4', fontWeight: 'bold', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
-
-                          {/* Book cost */}
-                          <td style={{ borderRight: '1px solid #2d303a' }}>
-                            <input 
-                              type="number" 
-                              value={row.bookCost} 
-                              onChange={(e) => handleCellChange(idx, 'bookCost', parseFloat(e.target.value) || 0.0)} 
-                              style={{ width: '80px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
-
-                          {/* Month */}
-                          <td style={{ borderRight: '1px solid #2d303a' }}>
-                            <input 
-                              type="text" 
-                              value={row.month} 
-                              onChange={(e) => handleCellChange(idx, 'month', e.target.value)} 
-                              style={{ width: '100px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
-
-                          {/* Year */}
-                          <td style={{ borderRight: '1px solid #2d303a' }}>
-                            <input 
-                              type="number" 
-                              value={row.year} 
-                              onChange={(e) => handleCellChange(idx, 'year', parseInt(e.target.value) || 2026)} 
-                              style={{ width: '60px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
-
-                          {/* Amazon Sales */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.amazonSales} 
-                              onChange={(e) => handleCellChange(idx, 'amazonSales', parseInt(e.target.value) || 0)} 
-                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#81c784', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
-                            />
-                          </td>
-
-                          {/* Amazon Royalty per unit (LOCKED FORMULA CELL) */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.08)', textAlign: 'center', color: '#81c784', fontWeight: 'bold' }}>
-                            ₹{calculatedAmzRoyalty.toFixed(2)}
-                          </td>
-
-                          {/* Total Amazon Royalty (LOCKED FORMULA CELL) */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.12)', textAlign: 'center', color: '#81c784', fontWeight: 'bold' }}>
-                            ₹{calculatedAmzTotal.toFixed(2)}
-                          </td>
-
-                          {/* Maybeify Sales */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(69, 90, 100, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.maybeifySales} 
-                              onChange={(e) => handleCellChange(idx, 'maybeifySales', parseInt(e.target.value) || 0)} 
-                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#90a4ae', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
-                            />
-                          </td>
-
-                          {/* Maybeify Royalty per unit */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(69, 90, 100, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.maybeifyRoyaltyPerUnit} 
-                              onChange={(e) => handleCellChange(idx, 'maybeifyRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
-                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#90a4ae', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
-
-                          {/* Google Sales */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(245, 127, 23, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.googleSales} 
-                              onChange={(e) => handleCellChange(idx, 'googleSales', parseInt(e.target.value) || 0)} 
-                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#ffd54f', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
-                            />
-                          </td>
-
-                          {/* Google Royalty per unit */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(245, 127, 23, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.googleRoyaltyPerUnit} 
-                              onChange={(e) => handleCellChange(idx, 'googleRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
-                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#ffd54f', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
-
-                          {/* Kindle Sales */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(194, 24, 91, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.kindleSales} 
-                              onChange={(e) => handleCellChange(idx, 'kindleSales', parseInt(e.target.value) || 0)} 
-                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#f48fb1', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
-                            />
-                          </td>
-
-                          {/* Kindle Royalty per unit */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(194, 24, 91, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.kindleRoyaltyPerUnit} 
-                              onChange={(e) => handleCellChange(idx, 'kindleRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
-                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#f48fb1', textAlign: 'center', outline: 'none' }}
-                            />
-                          </td>
-
-                          {/* Screenshot URL */}
-                          <td style={{ borderRight: '1px solid #2d303a' }}>
-                            <input 
-                              type="text" 
-                              value={row.screenshot} 
-                              onChange={(e) => handleCellChange(idx, 'screenshot', e.target.value)} 
-                              placeholder="URL Link"
-                              style={{ width: '150px', border: 'none', background: 'transparent', color: '#aaa', outline: 'none', fontSize: '0.75rem' }}
-                            />
-                          </td>
-
-                          {/* Action Delete */}
-                          <td style={{ textAlign: 'center' }}>
-                            <button 
-                              onClick={() => handleDeleteSheetRow(idx)}
-                              style={{ background: 'transparent', border: 'none', color: '#FF4B4B', cursor: 'pointer' }}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--surface-border)', paddingTop: '2rem', marginTop: '2rem' }}>
+                <button 
+                  onClick={handleSaveSpreadsheets}
+                  className="btn-primary"
+                  style={{
+                    padding: '0.8rem 2.5rem',
+                    borderRadius: '25px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    boxShadow: '0 8px 24px rgba(212, 175, 55, 0.15)'
+                  }}
+                >
+                  <Save size={18} /> Save All Sales Spreadsheets
+                </button>
+              </div>
             </div>
           ) : (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#555', border: '1px dashed var(--surface-border)', borderRadius: '8px' }}>
-              Select a Book from the dropdown menu to load and edit its platform sales spreadsheet.
+            <div style={{ padding: '3.5rem', textAlign: 'center', color: '#555', border: '1px dashed var(--surface-border)', borderRadius: '8px' }}>
+              Select an author's book from the dropdown menu to load and edit platform spreadsheets.
             </div>
           )}
-          {sheetMessage && <p style={{ color: 'var(--accent)', fontSize: '0.95rem', fontWeight: 'bold', marginTop: '1.2rem', margin: '1.2rem 0 0' }}>{sheetMessage}</p>}
+          {sheetMessage && <p style={{ color: 'var(--accent)', fontSize: '1rem', fontWeight: 'bold', marginTop: '1.5rem', textAlign: 'center' }}>{sheetMessage}</p>}
         </SpotlightCard>
       )}
 
