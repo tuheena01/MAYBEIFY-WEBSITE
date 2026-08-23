@@ -130,6 +130,25 @@ export async function POST(req) {
       const results = [];
       let totalImportedRoyalty = 0;
 
+      // Clean up/Delete any database reports that are NOT in the incoming reportsList
+      const existingReports = await prisma.salesPlatformReport.findMany({
+        where: { bookId }
+      });
+
+      for (const existing of existingReports) {
+        const isMatched = reportsList.some(r => 
+          r.platform.toUpperCase() === existing.platform.toUpperCase() &&
+          r.month === existing.month &&
+          parseInt(r.year) === existing.year
+        );
+
+        if (!isMatched) {
+          await prisma.salesPlatformReport.delete({
+            where: { id: existing.id }
+          });
+        }
+      }
+
       for (const rep of reportsList) {
         const platformStr = rep.platform.toUpperCase();
         const yearInt = parseInt(rep.year);
