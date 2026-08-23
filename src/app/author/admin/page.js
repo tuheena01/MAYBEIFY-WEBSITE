@@ -43,12 +43,21 @@ export default function AdminDashboard() {
   const [sheetMessage, setSheetMessage] = useState('');
 
   const fetchAdminData = () => {
+    const checkStatus = (res) => {
+      if (res.status === 401 || res.status === 403) {
+        document.cookie = 'token=; Max-Age=0; path=/';
+        window.location.href = '/author/login';
+        throw new Error('Unauthorized');
+      }
+      return res.json();
+    };
+
     Promise.all([
-      fetch('/api/admin/applications').then(res => res.json()),
-      fetch('/api/admin/pending-users').then(res => res.json()),
-      fetch('/api/admin/nominations').then(res => res.json()),
-      fetch('/api/admin/authors').then(res => res.json()),
-      fetch('/api/admin/withdrawals').then(res => res.json())
+      fetch('/api/admin/applications').then(checkStatus),
+      fetch('/api/admin/pending-users').then(checkStatus),
+      fetch('/api/admin/nominations').then(checkStatus),
+      fetch('/api/admin/authors').then(checkStatus),
+      fetch('/api/admin/withdrawals').then(checkStatus)
     ]).then(([appsData, usersData, nomsData, authorsData, withdrawalsData]) => {
       setApps(appsData);
       setPendingUsers(usersData);
@@ -56,6 +65,8 @@ export default function AdminDashboard() {
       setAuthors(authorsData.authors || []);
       setWithdrawals(withdrawalsData.withdrawals || []);
       setLoading(false);
+    }).catch(err => {
+      console.error('Fetch error:', err);
     });
   };
 
@@ -150,6 +161,11 @@ export default function AdminDashboard() {
           ...profileForm
         })
       });
+      if (res.status === 401 || res.status === 403) {
+        document.cookie = 'token=; Max-Age=0; path=/';
+        window.location.href = '/author/login';
+        return;
+      }
       if (res.ok) {
         setProfileMessage('Author profile details saved!');
         fetchAdminData();
@@ -183,6 +199,11 @@ export default function AdminDashboard() {
           synopsis: newBookSynopsis || ''
         })
       });
+      if (res.status === 401 || res.status === 403) {
+        document.cookie = 'token=; Max-Age=0; path=/';
+        window.location.href = '/author/login';
+        return;
+      }
       if (res.ok) {
         setBookMessage('Book registered successfully!');
         setNewBookTitle('');
@@ -342,6 +363,11 @@ export default function AdminDashboard() {
           reportsList
         })
       });
+      if (res.status === 401 || res.status === 403) {
+        document.cookie = 'token=; Max-Age=0; path=/';
+        window.location.href = '/author/login';
+        return;
+      }
       if (res.ok) {
         setSheetMessage('All platform spreadsheets saved successfully to DB!');
         fetchAdminData();
