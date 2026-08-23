@@ -11,24 +11,42 @@ datasource db {
 }
 
 model User {
-  id            String       @id @default(uuid())
-  email         String       @unique
-  name          String
-  password      String       
-  role          String       @default("AUTHOR") // "AUTHOR", "ADMIN", "AMBASSADOR", "PROJECT_HEAD", "COMPILER"
-  referralCode  String       @unique
-  referredBy    String?
-  isActive      Boolean      @default(false)
-  createdAt     DateTime     @default(now())
+  id                String              @id @default(uuid())
+  email             String              @unique
+  name              String
+  password          String       
+  role              String              @default("AUTHOR") // "AUTHOR", "ADMIN", "AMBASSADOR", "PROJECT_HEAD", "COMPILER"
+  referralCode      String              @unique
+  referredBy        String?
+  isActive          Boolean             @default(false)
+  createdAt         DateTime            @default(now())
   
-  projectHeadId String?      // Link Compiler to Project Head
+  // Profile Extensions
+  phone             String?
+  photo             String?             @default("https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200")
+  bio               String?
+  authorSince       DateTime            @default(now())
+  awards            String?             @default("")
+  publications      String?             @default("")
+  completionPercent Int                 @default(30)
+  status            String              @default("UNDER_REVIEW") // "ACTIVE", "UNDER_REVIEW", "PUBLISHED"
   
-  manuscripts   Manuscript[]
-  royalties     Royalty[]
-  messagesSent  Message[]    @relation("MessagesSent")
-  messagesRecv  Message[]    @relation("MessagesReceived")
-  enrollments   ChallengeEnrollment[]
-  books         Book[]
+  // Payment Details
+  bankAccount       String?
+  upiId             String?
+  paymentMethod     String?             @default("BANK_TRANSFER")
+  panGst            String?
+
+  projectHeadId     String?      // Link Compiler to Project Head
+  
+  manuscripts       Manuscript[]
+  royalties         Royalty[]
+  messagesSent      Message[]           @relation("MessagesSent")
+  messagesRecv      Message[]           @relation("MessagesReceived")
+  enrollments       ChallengeEnrollment[]
+  books             Book[]
+  transactions      Transaction[]
+  withdrawalRequests WithdrawalRequest[]
 }
 
 model Manuscript {
@@ -142,6 +160,15 @@ model Book {
   sales           BookSale[]
   platformReports SalesPlatformReport[]
   createdAt       DateTime              @default(now())
+
+  // Book Details & Analytics Extensions
+  cover           String?               @default("https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=400")
+  synopsis        String?
+  status          String                @default("UNDER_REVIEW") // "PUBLISHED", "UNDER_REVIEW", "DRAFT", "REJECTED"
+  views           Int                   @default(0)
+  downloads       Int                   @default(0)
+  reads           Int                   @default(0)
+  rating          Float                 @default(5.0)
 }
 
 model BookSale {
@@ -156,16 +183,40 @@ model BookSale {
 }
 
 model SalesPlatformReport {
+  id             String   @id @default(uuid())
+  bookId         String
+  book           Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  platform       String   // "AMAZON", "KINDLE", "PLAYBOOKS"
+  month          String   // e.g. "July 2026"
+  year           Int
+  mrp            Float    @default(0.0)
+  printingCost   Float    @default(0.0)
+  shippingCost   Float    @default(0.0)
+  royaltyPerUnit Float    @default(0.0)
+  unitsSold      Int      @default(0)
+  revenue        Float    @default(0.0)
+  screenshot     String?  // URL to Amazon dashboard screenshot
+  createdAt      DateTime @default(now())
+}
+
+model Transaction {
   id          String   @id @default(uuid())
-  bookId      String
-  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  platform    String   // "AMAZON", "KINDLE", "PLAYBOOKS"
-  month       String   // e.g. "July 2026"
-  year        Int
-  unitsSold   Int      @default(0)
-  revenue     Float    @default(0.0)
-  screenshot  String?  // URL to Amazon dashboard screenshot
+  description String
+  amount      Float
+  status      String   @default("PAID") // "PAID", "PENDING"
+  type        String   // "ROYALTY", "REFERRAL", "SALE"
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
+}
+
+model WithdrawalRequest {
+  id        String   @id @default(uuid())
+  amount    Float
+  status    String   @default("PENDING") // "PENDING", "APPROVED", "REJECTED"
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 

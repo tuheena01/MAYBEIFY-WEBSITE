@@ -13,7 +13,13 @@ export async function GET(req) {
 
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      select: { referralCode: true, createdAt: true }
+      select: {
+        name: true,
+        completionPercent: true,
+        status: true,
+        referralCode: true,
+        createdAt: true
+      }
     });
 
     if (!user) {
@@ -40,7 +46,7 @@ export async function GET(req) {
       where: { referredBy: user.referralCode }
     });
 
-    // 4. Sales count
+    // 4. Books stats
     const books = await prisma.book.findMany({
       where: { authorId: payload.userId },
       include: {
@@ -48,12 +54,29 @@ export async function GET(req) {
       }
     });
 
+    const totalBooks = books.length;
+    const publishedBooks = books.filter(b => b.status === 'PUBLISHED').length;
+
     let totalUnitsSold = 0;
+    let totalSalesRevenue = 0;
     books.forEach(b => {
       totalUnitsSold += b.platformReports.reduce((sum, s) => sum + s.unitsSold, 0);
+      totalSalesRevenue += b.platformReports.reduce((sum, s) => sum + s.revenue, 0);
     });
 
-    // 5. Recent Activity
+    // 5. Royalties total earnings
+    const royalties = await prisma.royalty.findMany({
+      where: { authorId: payload.userId }
+    });
+    const transactions = await prisma.transaction.findMany({
+      where: { authorId: payload.userId }
+    });
+    
+    // Total earnings = royalties sum + non-royalty paid transactions sum
+    const totalEarnings = royalties.reduce((sum, r) => sum + r.amount, 0) +
+      transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
+
+    // 6. Recent Activity
     const activities = [];
 
     // Add welcome activity
@@ -103,11 +126,19 @@ export async function GET(req) {
 
     return NextResponse.json({
       success: true,
+      author: {
+        name: user.name,
+        completionPercent: user.completionPercent,
+        status: user.status
+      },
       stats: {
         manuscriptsCount,
         messageCount,
         referralsCount,
         totalUnitsSold,
+        totalBooks,
+        publishedBooks,
+        totalEarnings
       },
       activities: finalActivities
     });

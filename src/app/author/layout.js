@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './authorLayout.module.css';
-import { LayoutDashboard, MessageSquare, DollarSign, Users, LogOut, ShieldAlert, BookOpen, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Users, LogOut, TrendingUp, User, BookOpen, BarChart3, Wallet } from 'lucide-react';
 
 export default function AuthorLayout({ children }) {
   const pathname = usePathname();
@@ -20,14 +20,23 @@ export default function AuthorLayout({ children }) {
             <Link href="/author/dashboard" className={`${styles.navLink} ${pathname === '/author/dashboard' ? styles.active : ''}`}>
               <LayoutDashboard size={20} /> Dashboard
             </Link>
+            <Link href="/author/profile" className={`${styles.navLink} ${pathname === '/author/profile' ? styles.active : ''}`}>
+              <User size={20} /> My Profile
+            </Link>
+            <Link href="/author/books" className={`${styles.navLink} ${pathname.startsWith('/author/books') ? styles.active : ''}`}>
+              <BookOpen size={20} /> My Books
+            </Link>
             <Link href="/author/sales" className={`${styles.navLink} ${pathname === '/author/sales' ? styles.active : ''}`}>
               <TrendingUp size={20} /> Book Sales
             </Link>
+            <Link href="/author/earnings" className={`${styles.navLink} ${pathname === '/author/earnings' ? styles.active : ''}`}>
+              <Wallet size={20} /> Earnings
+            </Link>
+            <Link href="/author/analytics" className={`${styles.navLink} ${pathname === '/author/analytics' ? styles.active : ''}`}>
+              <BarChart3 size={20} /> Analytics
+            </Link>
             <Link href="/author/communications" className={`${styles.navLink} ${pathname === '/author/communications' ? styles.active : ''}`}>
               <MessageSquare size={20} /> Communications
-            </Link>
-            <Link href="/author/royalties" className={`${styles.navLink} ${pathname === '/author/royalties' ? styles.active : ''}`}>
-              <DollarSign size={20} /> Royalties
             </Link>
             <Link href="/author/referrals" className={`${styles.navLink} ${pathname === '/author/referrals' ? styles.active : ''}`}>
               <Users size={20} /> Referrals
@@ -49,4 +58,3 @@ export default function AuthorLayout({ children }) {
     </div>
   );
 }
-
