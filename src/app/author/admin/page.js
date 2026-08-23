@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import styles from './Admin.module.css';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
+import { Save, Plus, FileSpreadsheet, Edit3, Trash2 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [apps, setApps] = useState([]);
@@ -11,27 +13,31 @@ export default function AdminDashboard() {
   const [withdrawals, setWithdrawals] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Forms states
+  // Author Profile Editor state
   const [selectedAuthorId, setSelectedAuthorId] = useState('');
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    bio: '',
+    status: 'UNDER_REVIEW',
+    completionPercent: 30,
+    awards: '',
+    publications: ''
+  });
+  const [profileMessage, setProfileMessage] = useState('');
+
+  // Book selection state
+  const [selectedBookId, setSelectedBookId] = useState('');
   const [newBookTitle, setNewBookTitle] = useState('');
   const [newBookPrice, setNewBookPrice] = useState('');
   const [newBookCover, setNewBookCover] = useState('');
   const [newBookSynopsis, setNewBookSynopsis] = useState('');
   const [bookMessage, setBookMessage] = useState('');
 
-  // Sales report state
-  const [selectedBookId, setSelectedBookId] = useState('');
-  const [platform, setPlatform] = useState('AMAZON');
-  const [month, setMonth] = useState('August');
-  const [year, setYear] = useState('2026');
-  const [unitsSold, setUnitsSold] = useState('');
-  const [revenue, setRevenue] = useState('');
-  const [screenshot, setScreenshot] = useState('');
-  const [reportMessage, setReportMessage] = useState('');
-
-  // Bulk Excel Sheet simulated upload state
-  const [excelText, setExcelText] = useState('');
-  const [excelMessage, setExcelMessage] = useState('');
+  // Interactive horizontal spreadsheet state
+  const [spreadsheetRows, setSpreadsheetRows] = useState([]);
+  const [sheetMessage, setSheetMessage] = useState('');
 
   const fetchAdminData = () => {
     Promise.all([
@@ -54,44 +60,118 @@ export default function AdminDashboard() {
     fetchAdminData();
   }, []);
 
-  const handleApproveApp = async (app) => {
-    if (!confirm(`Approve ${app.name} as an author?`)) return;
-    try {
-      const res = await fetch('/api/admin/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ appId: app.id }),
-      });
-      if (res.ok) {
-        const result = await res.json();
-        alert(`Author account created!\nEmail: ${app.email}\nPassword: ${result.password}\n\nPlease share these credentials with the author.`);
-        setApps(apps.filter(a => a.id !== app.id));
-        fetchAdminData();
-      } else {
-        alert('Approval failed.');
+  // Update form fields when author changes
+  useEffect(() => {
+    if (selectedAuthorId) {
+      const author = authors.find(a => a.id === selectedAuthorId);
+      if (author) {
+        setProfileForm({
+          name: author.name || '',
+          email: author.email || '',
+          phone: author.phone || '',
+          bio: author.bio || '',
+          status: author.status || 'UNDER_REVIEW',
+          completionPercent: author.completionPercent || 30,
+          awards: author.awards || '',
+          publications: author.publications || ''
+        });
+        setSelectedBookId('');
+        setSpreadsheetRows([]);
       }
-    } catch (err) {
-      alert('Error approving application.');
+    } else {
+      setProfileForm({
+        name: '',
+        email: '',
+        phone: '',
+        bio: '',
+        status: 'UNDER_REVIEW',
+        completionPercent: 30,
+        awards: '',
+        publications: ''
+      });
+      setSelectedBookId('');
+      setSpreadsheetRows([]);
     }
+  }, [selectedAuthorId, authors]);
+
+  // Load spreadsheet rows when book changes
+  useEffect(() => {
+    if (selectedBookId && selectedAuthorId) {
+      const author = authors.find(a => a.id === selectedAuthorId);
+      const book = author?.books?.find(b => b.id === selectedBookId);
+      
+      if (book && book.platformReports) {
+        // Group reports by Month & Year to build horizontal row entities
+        const bookReports = book.platformReports;
+        const months = Array.from(new Set(bookReports.map(r => `${r.month} ${r.year}`)));
+        
+        const rows = months.map(m => {
+          const [monthName, yearStr] = m.split(' ');
+          const yearVal = parseInt(yearStr);
+
+          const amz = bookReports.find(r => r.platform.toUpperCase() === 'AMAZON' && r.month === monthName && r.year === yearVal);
+          const kdl = bookReports.find(r => r.platform.toUpperCase() === 'KINDLE' && r.month === monthName && r.year === yearVal);
+          const pb = bookReports.find(r => r.platform.toUpperCase() === 'PLAYBOOKS' && r.month === monthName && r.year === yearVal);
+          const mbf = bookReports.find(r => r.platform.toUpperCase() === 'MAYBEIFY' && r.month === monthName && r.year === yearVal);
+
+          const mrp = amz?.mrp || kdl?.mrp || pb?.mrp || mbf?.mrp || book.price || 299;
+          const printingPrice = amz?.printingCost || mbf?.printingCost || 85.00;
+
+          return {
+            month: monthName,
+            year: yearVal,
+            printingPrice,
+            bookCost: mrp,
+            amazonSales: amz?.unitsSold || 0,
+            amazonRoyaltyPerUnit: amz?.royaltyPerUnit || 60.00,
+            maybeifySales: mbf?.unitsSold || 0,
+            maybeifyRoyaltyPerUnit: mbf?.royaltyPerUnit || 0.0,
+            googleSales: pb?.unitsSold || 0,
+            googleRoyaltyPerUnit: pb?.royaltyPerUnit || 55.00,
+            kindleSales: kdl?.unitsSold || 0,
+            kindleRoyaltyPerUnit: kdl?.royaltyPerUnit || 45.00,
+            screenshot: amz?.screenshot || kdl?.screenshot || pb?.screenshot || mbf?.screenshot || ''
+          };
+        });
+        setSpreadsheetRows(rows);
+      } else {
+        setSpreadsheetRows([]);
+      }
+    } else {
+      setSpreadsheetRows([]);
+    }
+  }, [selectedBookId, selectedAuthorId, authors]);
+
+  // Profile Form Change Handler
+  const handleProfileChange = (e) => {
+    setProfileForm({
+      ...profileForm,
+      [e.target.name]: e.target.value
+    });
   };
 
-  const handleActivateUser = async (user) => {
-    if (!confirm(`Activate account for ${user.name}?`)) return;
+  // Submit profile changes
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    setProfileMessage('Saving author details...');
     try {
-      const res = await fetch('/api/admin/activate-user', {
+      const res = await fetch('/api/admin/authors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({
+          id: selectedAuthorId,
+          ...profileForm
+        })
       });
       if (res.ok) {
-        alert(`${user.name}'s account is now live.`);
-        setPendingUsers(pendingUsers.filter(u => u.id !== user.id));
+        setProfileMessage('Author profile details saved!');
         fetchAdminData();
       } else {
-        alert('Activation failed.');
+        const err = await res.json();
+        setProfileMessage(`Error: ${err.error || 'Failed'}`);
       }
     } catch (err) {
-      alert('Error activating user.');
+      setProfileMessage('Network error.');
     }
   };
 
@@ -132,99 +212,125 @@ export default function AdminDashboard() {
     }
   };
 
-  // Add Sales Report Row
-  const handleAddReport = async (e) => {
-    e.preventDefault();
-    if (!selectedBookId || !unitsSold || !revenue) {
-      setReportMessage('Please select Book, units, and revenue.');
-      return;
-    }
-    setReportMessage('Saving report...');
-    try {
-      const res = await fetch('/api/admin/sales-report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'add_report',
-          bookId: selectedBookId,
-          platform,
-          month: `${month}`,
-          year: parseInt(year),
-          unitsSold: parseInt(unitsSold),
-          revenue: parseFloat(revenue),
-          screenshot: screenshot || undefined
-        })
-      });
-      if (res.ok) {
-        setReportMessage('Platform sales report updated successfully!');
-        setUnitsSold('');
-        setRevenue('');
-        setScreenshot('');
-      } else {
-        const err = await res.json();
-        setReportMessage(`Error: ${err.error || 'Failed'}`);
-      }
-    } catch (err) {
-      setReportMessage('Network error.');
-    }
+  // Add Row to horizontal spreadsheet editor
+  const handleAddSheetRow = () => {
+    const newRow = {
+      month: 'September',
+      year: 2026,
+      printingPrice: 85.0,
+      bookCost: 299.0,
+      amazonSales: 0,
+      amazonRoyaltyPerUnit: 60.0,
+      maybeifySales: 0,
+      maybeifyRoyaltyPerUnit: 0.0,
+      googleSales: 0,
+      googleRoyaltyPerUnit: 55.0,
+      kindleSales: 0,
+      kindleRoyaltyPerUnit: 45.0,
+      screenshot: ''
+    };
+    setSpreadsheetRows([...spreadsheetRows, newRow]);
   };
 
-  // Bulk Excel Sheet simulated upload
-  const handleBulkImport = async (e) => {
-    e.preventDefault();
-    if (!selectedBookId || !excelText) {
-      setExcelMessage('Select a Book and paste Excel/JSON text.');
-      return;
-    }
-    setExcelMessage('Parsing and importing...');
-    try {
-      let parsedData;
-      try {
-        // Try parsing JSON list first
-        parsedData = JSON.parse(excelText);
-      } catch (err) {
-        // Fallback: parse CSV/Tab-delimited format
-        const lines = excelText.trim().split('\n');
-        parsedData = lines.map(line => {
-          const parts = line.split(/[\t,]/); // comma or tab
-          return {
-            platform: parts[0]?.trim() || 'AMAZON',
-            month: parts[1]?.trim() || 'August',
-            year: parts[2]?.trim() || '2026',
-            unitsSold: parts[3]?.trim() || '10',
-            revenue: parts[4]?.trim() || '100',
-            screenshot: parts[5]?.trim() || ''
-          };
-        });
-      }
+  // Row cell editing
+  const handleCellChange = (index, field, value) => {
+    const updated = [...spreadsheetRows];
+    updated[index][field] = value;
+    setSpreadsheetRows(updated);
+  };
 
+  // Delete row
+  const handleDeleteSheetRow = (index) => {
+    setSpreadsheetRows(spreadsheetRows.filter((_, i) => i !== index));
+  };
+
+  // Save spreadsheet grid rows
+  const handleSaveSpreadsheet = async () => {
+    if (!selectedBookId) return;
+    setSheetMessage('Compiling and saving grid...');
+
+    // Compile horizontal rows to platform reports list
+    const reportsList = [];
+    spreadsheetRows.forEach(row => {
+      // Amazon
+      reportsList.push({
+        platform: 'AMAZON',
+        month: row.month,
+        year: parseInt(row.year) || 2026,
+        mrp: parseFloat(row.bookCost) || 0.0,
+        printingCost: parseFloat(row.printingPrice) || 0.0,
+        shippingCost: 40.00,
+        royaltyPerUnit: parseFloat(row.amazonRoyaltyPerUnit) || 0.0,
+        unitsSold: parseInt(row.amazonSales) || 0,
+        revenue: (parseInt(row.amazonSales) || 0) * (parseFloat(row.amazonRoyaltyPerUnit) || 0.0),
+        screenshot: row.screenshot || null
+      });
+      // Maybeify
+      reportsList.push({
+        platform: 'MAYBEIFY',
+        month: row.month,
+        year: parseInt(row.year) || 2026,
+        mrp: parseFloat(row.bookCost) || 0.0,
+        printingCost: parseFloat(row.printingPrice) || 0.0,
+        shippingCost: 0.00,
+        royaltyPerUnit: parseFloat(row.maybeifyRoyaltyPerUnit) || 0.0,
+        unitsSold: parseInt(row.maybeifySales) || 0,
+        revenue: (parseInt(row.maybeifySales) || 0) * (parseFloat(row.maybeifyRoyaltyPerUnit) || 0.0),
+        screenshot: row.screenshot || null
+      });
+      // Playbooks
+      reportsList.push({
+        platform: 'PLAYBOOKS',
+        month: row.month,
+        year: parseInt(row.year) || 2026,
+        mrp: parseFloat(row.bookCost) || 0.0,
+        printingCost: 0.0,
+        shippingCost: 0.0,
+        royaltyPerUnit: parseFloat(row.googleRoyaltyPerUnit) || 0.0,
+        unitsSold: parseInt(row.googleSales) || 0,
+        revenue: (parseInt(row.googleSales) || 0) * (parseFloat(row.googleRoyaltyPerUnit) || 0.0),
+        screenshot: row.screenshot || null
+      });
+      // Kindle
+      reportsList.push({
+        platform: 'KINDLE',
+        month: row.month,
+        year: parseInt(row.year) || 2026,
+        mrp: parseFloat(row.bookCost) || 0.0,
+        printingCost: 0.0,
+        shippingCost: 0.0,
+        royaltyPerUnit: parseFloat(row.kindleRoyaltyPerUnit) || 0.0,
+        unitsSold: parseInt(row.kindleSales) || 0,
+        revenue: (parseInt(row.kindleSales) || 0) * (parseFloat(row.kindleRoyaltyPerUnit) || 0.0),
+        screenshot: row.screenshot || null
+      });
+    });
+
+    try {
       const res = await fetch('/api/admin/sales-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'bulk_import',
           bookId: selectedBookId,
-          reportsList: parsedData
+          reportsList
         })
       });
-
       if (res.ok) {
-        const data = await res.json();
-        setExcelMessage(`Imported ${data.count} report rows successfully!`);
-        setExcelText('');
+        setSheetMessage('Excel Sales spreadsheet saved successfully to DB!');
         fetchAdminData();
       } else {
         const err = await res.json();
-        setExcelMessage(`Import failed: ${err.error}`);
+        setSheetMessage(`Error: ${err.error || 'Failed to save spreadsheet'}`);
       }
     } catch (err) {
-      setExcelMessage('Failed to parse sheet data. Ensure correct CSV/Tab/JSON structure.');
+      setSheetMessage('Network error occurred.');
     }
   };
 
-  // Withdrawal approval
+  // Approve/Reject withdrawal
   const handleResolveWithdrawal = async (id, status) => {
-    if (!confirm(`Are you sure you want to mark this request as ${status}?`)) return;
+    if (!confirm(`Resolve this withdrawal request as ${status}?`)) return;
     try {
       const res = await fetch('/api/admin/withdrawals', {
         method: 'POST',
@@ -232,10 +338,10 @@ export default function AdminDashboard() {
         body: JSON.stringify({ id, status })
       });
       if (res.ok) {
-        alert(`Withdrawal request ${status.toLowerCase()} successfully!`);
+        alert(`Withdrawal request marked as ${status}!`);
         fetchAdminData();
       } else {
-        alert('Resolution failed.');
+        alert('Operation failed.');
       }
     } catch (err) {
       alert('Network error.');
@@ -248,240 +354,494 @@ export default function AdminDashboard() {
   if (loading) return <div className={styles.container}>Loading administration console...</div>;
 
   return (
-    <div className={styles.container} style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
+    <div className={styles.container} style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
       <h1 className="serif" style={{ fontSize: '2.8rem', borderBottom: '1px solid var(--surface-border)', paddingBottom: '1rem', marginBottom: '2.5rem' }}>
         Maybeify Publishing Admin Console
       </h1>
 
-      {/* ── SECTION: MANAGE BOOKS & SALES ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
-        
-        {/* Book Creator */}
-        <div className={styles.card} style={{ padding: '2rem', background: 'rgba(255,255,255,0.01)' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--accent)' }}>
-            Register New Book
-          </h2>
-          <form onSubmit={handleCreateBook} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-              <label style={{ fontSize: '0.85rem', color: '#888' }}>Select Author</label>
-              <select 
-                value={selectedAuthorId} 
-                onChange={(e) => { setSelectedAuthorId(e.target.value); setSelectedBookId(''); }}
-                style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.3)', background: '#1c1e24', color: 'white', outline: 'none', cursor: 'pointer' }}
-              >
-                <option value="">-- Choose Author --</option>
-                {authors.map(a => (
-                  <option key={a.id} value={a.id}>{a.name} ({a.email})</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-              <label style={{ fontSize: '0.85rem', color: '#888' }}>Book Title</label>
-              <input 
-                type="text" 
-                value={newBookTitle} 
-                onChange={(e) => setNewBookTitle(e.target.value)} 
-                placeholder="e.g. Love under the stars"
-                style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
-              />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Price (₹)</label>
-                <input 
-                  type="number" 
-                  value={newBookPrice} 
-                  onChange={(e) => setNewBookPrice(e.target.value)} 
-                  placeholder="₹"
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
-                />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Cover Image URL</label>
-                <input 
-                  type="text" 
-                  value={newBookCover} 
-                  onChange={(e) => setNewBookCover(e.target.value)}
-                  placeholder="URL link"
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-              <label style={{ fontSize: '0.85rem', color: '#888' }}>Synopsis</label>
-              <textarea 
-                value={newBookSynopsis} 
-                onChange={(e) => setNewBookSynopsis(e.target.value)}
-                rows={2}
-                style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none', resize: 'vertical' }}
-              />
-            </div>
-
-            <button type="submit" className="btn-primary" style={{ padding: '0.8rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-              Create Book
-            </button>
-            {bookMessage && <p style={{ fontSize: '0.9rem', color: 'var(--accent)', marginTop: '0.5rem' }}>{bookMessage}</p>}
-          </form>
+      {/* Global Author Selector Header */}
+      <SpotlightCard className="glass" style={{ padding: '1.5rem', marginBottom: '3rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: '1.3rem' }}>Select Target Author:</h3>
+          <select 
+            value={selectedAuthorId} 
+            onChange={(e) => setSelectedAuthorId(e.target.value)}
+            style={{ 
+              padding: '0.8rem 1.5rem', 
+              borderRadius: '8px', 
+              border: '1px solid rgba(255,255,255,0.3)', 
+              background: '#1c1e24', 
+              color: 'white', 
+              outline: 'none', 
+              fontWeight: 'bold',
+              minWidth: '280px',
+              cursor: 'pointer' 
+            }}
+          >
+            <option value="">-- Choose Author Portal --</option>
+            {authors.map(a => (
+              <option key={a.id} value={a.id}>{a.name} ({a.email})</option>
+            ))}
+          </select>
         </div>
+      </SpotlightCard>
 
-        {/* Sales Report Grid Manager */}
-        <div className={styles.card} style={{ padding: '2rem', background: 'rgba(255,255,255,0.01)' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--accent)' }}>
-            Submit Sales Report (Single Row)
-          </h2>
-          <form onSubmit={handleAddReport} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Select Author</label>
-                <select 
-                  value={selectedAuthorId} 
-                  onChange={(e) => { setSelectedAuthorId(e.target.value); setSelectedBookId(''); }}
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.3)', background: '#1c1e24', color: 'white', outline: 'none', cursor: 'pointer' }}
-                >
-                  <option value="">-- Choose Author --</option>
-                  {authors.map(a => (
-                    <option key={a.id} value={a.id}>{a.name}</option>
-                  ))}
-                </select>
+      {/* ── SECTION: AUTHOR DETAILS & BOOK CREATOR ── */}
+      {selectedAuthorId && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+          
+          {/* Author Profile details editor */}
+          <SpotlightCard className="glass" style={{ padding: '2rem' }}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--accent)' }}>
+              Update Profile Details for {profileForm.name}
+            </h2>
+            <form onSubmit={handleProfileSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#888' }}>Display Name</label>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    value={profileForm.name} 
+                    onChange={handleProfileChange}
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#888' }}>Email Address</label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    value={profileForm.email} 
+                    onChange={handleProfileChange}
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#888' }}>Contact Phone</label>
+                  <input 
+                    type="text" 
+                    name="phone" 
+                    value={profileForm.phone} 
+                    onChange={handleProfileChange}
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#888' }}>Author Status</label>
+                  <select 
+                    name="status"
+                    value={profileForm.status} 
+                    onChange={handleProfileChange}
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.3)', background: '#1c1e24', color: 'white', outline: 'none', cursor: 'pointer' }}
+                  >
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="UNDER_REVIEW">UNDER_REVIEW</option>
+                    <option value="PUBLISHED">PUBLISHED</option>
+                  </select>
+                </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Select Book</label>
-                <select 
-                  value={selectedBookId} 
-                  onChange={(e) => setSelectedBookId(e.target.value)}
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.3)', background: '#1c1e24', color: 'white', outline: 'none', cursor: 'pointer' }}
-                  disabled={!selectedAuthorId}
-                >
-                  <option value="">-- Choose Book --</option>
-                  {authorBooks.map(b => (
-                    <option key={b.id} value={b.id}>{b.title}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Platform</label>
-                <select 
-                  value={platform} 
-                  onChange={(e) => setPlatform(e.target.value)}
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.3)', background: '#1c1e24', color: 'white', outline: 'none', cursor: 'pointer' }}
-                >
-                  <option value="AMAZON">Amazon Store</option>
-                  <option value="KINDLE">Amazon Kindle</option>
-                  <option value="PLAYBOOKS">Google Playbooks</option>
-                </select>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Month</label>
-                <input 
-                  type="text" 
-                  value={month} 
-                  onChange={(e) => setMonth(e.target.value)}
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
-                />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Year</label>
-                <input 
-                  type="text" 
-                  value={year} 
-                  onChange={(e) => setYear(e.target.value)}
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Units Sold</label>
+                <label style={{ fontSize: '0.8rem', color: '#888' }}>Completion Percent (%)</label>
                 <input 
                   type="number" 
-                  value={unitsSold} 
-                  onChange={(e) => setUnitsSold(e.target.value)} 
-                  placeholder="0"
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
+                  name="completionPercent" 
+                  value={profileForm.completionPercent} 
+                  onChange={handleProfileChange}
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
                 />
               </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#888' }}>Gross Revenue (₹)</label>
-                <input 
-                  type="number" 
-                  value={revenue} 
-                  onChange={(e) => setRevenue(e.target.value)} 
-                  placeholder="₹"
-                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
+                <label style={{ fontSize: '0.8rem', color: '#888' }}>Short Bio</label>
+                <textarea 
+                  name="bio"
+                  value={profileForm.bio} 
+                  onChange={handleProfileChange}
+                  rows={2}
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none', resize: 'vertical' }}
                 />
               </div>
-            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-              <label style={{ fontSize: '0.85rem', color: '#888' }}>Screenshot Proof Link</label>
-              <input 
-                type="text" 
-                value={screenshot} 
-                onChange={(e) => setScreenshot(e.target.value)} 
-                placeholder="Image/Proof URL"
-                style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none' }}
-              />
-            </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <label style={{ fontSize: '0.8rem', color: '#888' }}>Awards & Achievments</label>
+                <input 
+                  type="text" 
+                  name="awards" 
+                  value={profileForm.awards} 
+                  onChange={handleProfileChange}
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                />
+              </div>
 
-            <button type="submit" className="btn-primary" style={{ padding: '0.8rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-              Save Report Row
-            </button>
-            {reportMessage && <p style={{ fontSize: '0.9rem', color: 'var(--accent)', marginTop: '0.5rem' }}>{reportMessage}</p>}
-          </form>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <label style={{ fontSize: '0.8rem', color: '#888' }}>Key Publications</label>
+                <input 
+                  type="text" 
+                  name="publications" 
+                  value={profileForm.publications} 
+                  onChange={handleProfileChange}
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                />
+              </div>
+
+              <button type="submit" className="btn-primary" style={{ padding: '0.8rem', borderRadius: '8px', fontWeight: 'bold' }}>
+                Save Author Profile Details
+              </button>
+              {profileMessage && <p style={{ color: 'var(--accent)', fontSize: '0.9rem', marginTop: '0.5rem' }}>{profileMessage}</p>}
+            </form>
+          </SpotlightCard>
+
+          {/* Book Creator */}
+          <SpotlightCard className="glass" style={{ padding: '2rem' }}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--accent)' }}>
+              Add a Book for this Author
+            </h2>
+            <form onSubmit={handleCreateBook} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <label style={{ fontSize: '0.8rem', color: '#888' }}>Book Title</label>
+                <input 
+                  type="text" 
+                  value={newBookTitle} 
+                  onChange={(e) => setNewBookTitle(e.target.value)} 
+                  placeholder="e.g. Beyond Blessed"
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#888' }}>Default Price (₹)</label>
+                  <input 
+                    type="number" 
+                    value={newBookPrice} 
+                    onChange={(e) => setNewBookPrice(e.target.value)} 
+                    placeholder="e.g. 399.00"
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#888' }}>Cover Image Link</label>
+                  <input 
+                    type="text" 
+                    value={newBookCover} 
+                    onChange={(e) => setNewBookCover(e.target.value)}
+                    placeholder="URL"
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <label style={{ fontSize: '0.8rem', color: '#888' }}>Synopsis</label>
+                <textarea 
+                  value={newBookSynopsis} 
+                  onChange={(e) => setNewBookSynopsis(e.target.value)}
+                  rows={4}
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', color: 'white', outline: 'none', resize: 'vertical' }}
+                />
+              </div>
+
+              <button type="submit" className="btn-primary" style={{ padding: '0.8rem', borderRadius: '8px', fontWeight: 'bold' }}>
+                Register Book Title
+              </button>
+              {bookMessage && <p style={{ color: 'var(--accent)', fontSize: '0.9rem', marginTop: '0.5rem' }}>{bookMessage}</p>}
+            </form>
+          </SpotlightCard>
+
         </div>
+      )}
 
-      </div>
-
-      {/* ── SECTION: BULK EXCEL SHEET simulated IMPORT ── */}
-      <div className={styles.card} style={{ padding: '2rem', marginBottom: '4rem', background: 'rgba(255,255,255,0.01)' }}>
-        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '0.5rem', color: 'var(--accent)' }}>
-          Import Sales Excel Sheet
-        </h2>
-        <p style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-          Paste comma-separated, tab-separated, or JSON list representing Excel sheets columns in the format: <code style={{ color: 'var(--accent)' }}>Platform, Month, Year, UnitsSold, Revenue, ScreenshotLink</code>
-        </p>
-        <form onSubmit={handleBulkImport}>
-          <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.3rem', minWidth: '200px' }}>
-              <label style={{ fontSize: '0.85rem', color: '#888' }}>Select Target Book</label>
+      {/* ── SECTION: INTERACTIVE HORIZONTAL EXCEL SPREADSHEET EDITOR ── */}
+      {selectedAuthorId && (
+        <SpotlightCard className="glass" style={{ padding: '2rem', marginBottom: '4rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', margin: 0, color: 'var(--accent)' }}>
+                Spreadsheet Grid Editor
+              </h2>
+              <p style={{ color: '#aaa', margin: '0.2rem 0 0', fontSize: '0.85rem' }}>Edit the horizontal sales sheet values directly inside cells. Save spreadsheet once completed.</p>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <select 
                 value={selectedBookId} 
                 onChange={(e) => setSelectedBookId(e.target.value)}
-                style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.3)', background: '#1c1e24', color: 'white', outline: 'none', cursor: 'pointer' }}
+                style={{ 
+                  padding: '0.6rem 1.2rem', 
+                  borderRadius: '8px', 
+                  border: '1px solid rgba(255,255,255,0.3)', 
+                  background: '#1c1e24', 
+                  color: 'white', 
+                  outline: 'none', 
+                  fontWeight: 'bold',
+                  cursor: 'pointer' 
+                }}
               >
-                <option value="">-- Choose Book --</option>
-                {authors.flatMap(a => a.books.map(b => (
-                  <option key={b.id} value={b.id}>{b.title} (by {a.name})</option>
-                )))}
+                <option value="">-- Select Book --</option>
+                {authorBooks.map(b => (
+                  <option key={b.id} value={b.id}>{b.title}</option>
+                ))}
               </select>
+
+              {selectedBookId && (
+                <>
+                  <button 
+                    onClick={handleAddSheetRow}
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      color: 'white',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                      fontSize: '0.85rem'
+                    }}
+                  >
+                    <Plus size={14} /> Add Row
+                  </button>
+
+                  <button 
+                    onClick={handleSaveSpreadsheet}
+                    className="btn-primary"
+                    style={{
+                      padding: '0.5rem 1.2rem',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    <Save size={14} /> Save Sales Spreadsheet
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '1.5rem' }}>
-            <label style={{ fontSize: '0.85rem', color: '#888' }}>Excel Data Content (Tab/CSV or JSON List)</label>
-            <textarea 
-              value={excelText}
-              onChange={(e) => setExcelText(e.target.value)}
-              placeholder="AMAZON, August, 2026, 60, 12000, https://screenshot.url&#10;KINDLE, August, 2026, 150, 8500, https://screenshot.url"
-              rows={4}
-              style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none', resize: 'vertical', fontFamily: 'monospace', fontSize: '0.9rem' }}
-            />
-          </div>
+          {selectedBookId ? (
+            <div style={{ overflowX: 'auto', border: '1px solid #2d303a', borderRadius: '8px' }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontFamily: 'monospace, sans-serif',
+                fontSize: '0.8rem',
+                color: '#c9d1d9',
+                minWidth: '1600px'
+              }}>
+                <thead>
+                  {/* Alphabet excel row */}
+                  <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a', textAlign: 'center' }}>
+                    <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a' }}></th>
+                    {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'].map((l, i) => (
+                      <th key={i} style={{ padding: '0.3rem', borderRight: '1px solid #2d303a', color: '#888' }}>{l}</th>
+                    ))}
+                    <th style={{ width: '60px' }}>Actions</th>
+                  </tr>
+                  {/* Excel headers */}
+                  <tr style={{ borderBottom: '1px solid #2d303a', fontWeight: 'bold', textAlign: 'center', color: 'white' }}>
+                    <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>1</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#d4af37', color: 'black' }}>Printing price</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#e28743', color: 'black' }}>Book cost</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Month</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Year</td>
+                    {/* Amazon */}
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Sales</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Royalty (unit)</td>
+                    {/* Maybeify */}
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Sales</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Royalty (unit)</td>
+                    {/* Google Playbooks */}
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#f57f17', color: 'black' }}>Google Sales</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#f57f17', color: 'black' }}>Google Royalty (unit)</td>
+                    {/* Kindle */}
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#c2185b' }}>Kindle Sales</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#c2185b' }}>Kindle Royalty (unit)</td>
+                    
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Screenshot proof URL</td>
+                    <td style={{ background: '#1c1e24' }}></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {spreadsheetRows.length === 0 ? (
+                    <tr>
+                      <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
+                      <td colSpan={14} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                        No spreadsheet rows. Click "Add Row" to initialize.
+                      </td>
+                    </tr>
+                  ) : (
+                    spreadsheetRows.map((row, idx) => {
+                      const rowNum = idx + 2;
+                      return (
+                        <tr key={idx} style={{ borderBottom: '1px solid #2d303a' }}>
+                          <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold', textAlign: 'center' }}>{rowNum}</td>
+                          
+                          {/* Printing price */}
+                          <td style={{ borderRight: '1px solid #2d303a' }}>
+                            <input 
+                              type="number" 
+                              value={row.printingPrice} 
+                              onChange={(e) => handleCellChange(idx, 'printingPrice', parseFloat(e.target.value) || 0.0)} 
+                              style={{ width: '80px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
 
-          <button type="submit" className="btn-primary" style={{ padding: '0.8rem 2rem', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>
-            Parse & Import Excel Sheet
-          </button>
-          {excelMessage && <p style={{ fontSize: '0.9rem', color: 'var(--accent)', marginTop: '1rem' }}>{excelMessage}</p>}
-        </form>
-      </div>
+                          {/* Book cost */}
+                          <td style={{ borderRight: '1px solid #2d303a' }}>
+                            <input 
+                              type="number" 
+                              value={row.bookCost} 
+                              onChange={(e) => handleCellChange(idx, 'bookCost', parseFloat(e.target.value) || 0.0)} 
+                              style={{ width: '80px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Month */}
+                          <td style={{ borderRight: '1px solid #2d303a' }}>
+                            <input 
+                              type="text" 
+                              value={row.month} 
+                              onChange={(e) => handleCellChange(idx, 'month', e.target.value)} 
+                              style={{ width: '100px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Year */}
+                          <td style={{ borderRight: '1px solid #2d303a' }}>
+                            <input 
+                              type="number" 
+                              value={row.year} 
+                              onChange={(e) => handleCellChange(idx, 'year', parseInt(e.target.value) || 2026)} 
+                              style={{ width: '60px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Amazon Sales */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.amazonSales} 
+                              onChange={(e) => handleCellChange(idx, 'amazonSales', parseInt(e.target.value) || 0)} 
+                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#81c784', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
+                            />
+                          </td>
+
+                          {/* Amazon Royalty per unit */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.amazonRoyaltyPerUnit} 
+                              onChange={(e) => handleCellChange(idx, 'amazonRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
+                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#81c784', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Maybeify Sales */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(69, 90, 100, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.maybeifySales} 
+                              onChange={(e) => handleCellChange(idx, 'maybeifySales', parseInt(e.target.value) || 0)} 
+                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#90a4ae', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
+                            />
+                          </td>
+
+                          {/* Maybeify Royalty per unit */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(69, 90, 100, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.maybeifyRoyaltyPerUnit} 
+                              onChange={(e) => handleCellChange(idx, 'maybeifyRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
+                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#90a4ae', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Google Sales */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(245, 127, 23, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.googleSales} 
+                              onChange={(e) => handleCellChange(idx, 'googleSales', parseInt(e.target.value) || 0)} 
+                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#ffd54f', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
+                            />
+                          </td>
+
+                          {/* Google Royalty per unit */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(245, 127, 23, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.googleRoyaltyPerUnit} 
+                              onChange={(e) => handleCellChange(idx, 'googleRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
+                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#ffd54f', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Kindle Sales */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(194, 24, 91, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.kindleSales} 
+                              onChange={(e) => handleCellChange(idx, 'kindleSales', parseInt(e.target.value) || 0)} 
+                              style={{ width: '60px', border: 'none', background: 'transparent', color: '#f48fb1', textAlign: 'center', outline: 'none', fontWeight: 'bold' }}
+                            />
+                          </td>
+
+                          {/* Kindle Royalty per unit */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(194, 24, 91, 0.03)' }}>
+                            <input 
+                              type="number" 
+                              value={row.kindleRoyaltyPerUnit} 
+                              onChange={(e) => handleCellChange(idx, 'kindleRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
+                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#f48fb1', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Screenshot URL */}
+                          <td style={{ borderRight: '1px solid #2d303a' }}>
+                            <input 
+                              type="text" 
+                              value={row.screenshot} 
+                              onChange={(e) => handleCellChange(idx, 'screenshot', e.target.value)} 
+                              placeholder="URL Link"
+                              style={{ width: '150px', border: 'none', background: 'transparent', color: '#aaa', outline: 'none', fontSize: '0.75rem' }}
+                            />
+                          </td>
+
+                          {/* Action Delete */}
+                          <td style={{ textAlign: 'center' }}>
+                            <button 
+                              onClick={() => handleDeleteSheetRow(idx)}
+                              style={{ background: 'transparent', border: 'none', color: '#FF4B4B', cursor: 'pointer' }}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#555', border: '1px dashed var(--surface-border)', borderRadius: '8px' }}>
+              Select a Book from the dropdown menu to load and edit its platform sales spreadsheet.
+            </div>
+          )}
+          {sheetMessage && <p style={{ color: 'var(--accent)', fontSize: '0.95rem', fontWeight: 'bold', marginTop: '1.2rem', margin: '1.2rem 0 0' }}>{sheetMessage}</p>}
+        </SpotlightCard>
+      )}
 
       {/* ── SECTION: WITHDRAWAL REQUESTS MANAGER ── */}
       <section className={styles.section} style={{ marginBottom: '4rem' }}>
@@ -491,7 +851,7 @@ export default function AdminDashboard() {
         ) : (
           <div className={styles.grid}>
             {withdrawals.map(req => (
-              <div key={req.id} className={styles.card} style={{ border: req.status === 'APPROVED' ? '1px solid var(--success)' : req.status === 'PENDING' ? '1px solid var(--accent)' : '1px solid #FF4B4B' }}>
+              <div key={req.id} className={styles.card} style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.01)', border: req.status === 'APPROVED' ? '1px solid var(--success)' : req.status === 'PENDING' ? '1px solid var(--accent)' : '1px solid #FF4B4B' }}>
                 <div className={styles.cardHeader}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span className={styles.date}>{new Date(req.createdAt).toLocaleDateString()}</span>
@@ -508,7 +868,7 @@ export default function AdminDashboard() {
                       {req.status}
                     </span>
                   </div>
-                  <h3 style={{ margin: '0.8rem 0 0.2rem' }}>₹{req.amount.toFixed(2)}</h3>
+                  <h3 style={{ margin: '0.8rem 0 0.2rem', fontSize: '1.5rem' }}>₹{req.amount.toFixed(2)}</h3>
                   <p style={{ margin: 0, fontSize: '0.85rem', color: '#888' }}>by {req.author.name} ({req.author.email})</p>
                 </div>
                 <div style={{ margin: '1rem 0', fontSize: '0.9rem', color: '#ccc' }}>
@@ -539,12 +899,12 @@ export default function AdminDashboard() {
       </section>
 
       {/* ── SECTION: MANUSCRIPT APPLICATIONS ── */}
-      <section className={styles.section}>
+      <section className={styles.section} style={{ marginBottom: '4rem' }}>
         <h2 className={styles.sectionTitle}>Manuscript Submissions</h2>
         <div className={styles.grid}>
           {apps.length === 0 && <p className={styles.empty}>No pending manuscripts.</p>}
           {apps.map(app => (
-            <div key={app.id} className={styles.card}>
+            <div key={app.id} className={styles.card} style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.01)' }}>
               <div className={styles.cardHeader}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                   <span className={styles.date}>{new Date(app.createdAt).toLocaleDateString()}</span>
@@ -559,7 +919,7 @@ export default function AdminDashboard() {
                 <strong>{app.name}</strong> · <span>{app.email}</span>
               </div>
               <p className={styles.synopsis}>{app.synopsis}</p>
-              <div className={styles.actions}>
+              <div className={styles.actions} style={{ marginTop: '1.5rem' }}>
                 <button className={styles.approveBtn} onClick={() => handleApproveApp(app)}>Approve & Create Account</button>
               </div>
             </div>
@@ -568,12 +928,12 @@ export default function AdminDashboard() {
       </section>
 
       {/* ── SECTION: PENDING ACCOUNTS ── */}
-      <section className={styles.section} style={{ marginTop: '4rem' }}>
+      <section className={styles.section} style={{ marginBottom: '4rem' }}>
         <h2 className={styles.sectionTitle}>Account Requests</h2>
         <div className={styles.grid}>
           {pendingUsers.length === 0 && <p className={styles.empty}>No pending account requests.</p>}
           {pendingUsers.map(user => (
-            <div key={user.id} className={styles.card}>
+            <div key={user.id} className={styles.card} style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.01)' }}>
               <div className={styles.cardHeader}>
                 <span className={styles.date}>{new Date(user.createdAt).toLocaleDateString()}</span>
                 <h3>{user.name}</h3>
@@ -581,7 +941,7 @@ export default function AdminDashboard() {
               <div className={styles.authorInfo}>
                 <span>{user.email}</span>
               </div>
-              <div className={styles.actions}>
+              <div className={styles.actions} style={{ marginTop: '1.5rem' }}>
                 <button className={styles.approveBtn} onClick={() => handleActivateUser(user)}>Activate Account</button>
               </div>
             </div>
@@ -589,13 +949,13 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* ── SECTION: NOMINATIONS ── */}
-      <section className={styles.section} style={{ marginTop: '4rem' }}>
+      {/* ── SECTION: AWARD NOMINATIONS ── */}
+      <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Award Nominations</h2>
         <div className={styles.grid}>
           {nominations.length === 0 && <p className={styles.empty}>No nominations submitted.</p>}
           {nominations.map(nom => (
-            <div key={nom.id} className={styles.card}>
+            <div key={nom.id} className={styles.card} style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.01)' }}>
               <div className={styles.cardHeader}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                   <span className={styles.date}>{new Date(nom.createdAt).toLocaleDateString()}</span>
@@ -611,7 +971,7 @@ export default function AdminDashboard() {
               <div className={styles.authorInfo}>
                 <span>Email: {nom.email}</span>
               </div>
-              <p className={styles.synopsis} style={{ whiteSpace: 'pre-wrap', marginTop: '1rem', color: 'var(--text2)' }}>
+              <p className={styles.synopsis} style={{ whiteSpace: 'pre-wrap', marginTop: '1rem', color: '#aaa' }}>
                 <strong>Reason:</strong> {nom.reason}
               </p>
             </div>

@@ -63,17 +63,18 @@ export default function BookSales() {
     const amazonReport = bookReports.find(r => r.platform.toUpperCase() === 'AMAZON' && r.month === monthName && r.year === yearVal);
     const kindleReport = bookReports.find(r => r.platform.toUpperCase() === 'KINDLE' && r.month === monthName && r.year === yearVal);
     const playbooksReport = bookReports.find(r => r.platform.toUpperCase() === 'PLAYBOOKS' && r.month === monthName && r.year === yearVal);
+    const maybeifyReport = bookReports.find(r => r.platform.toUpperCase() === 'MAYBEIFY' && r.month === monthName && r.year === yearVal);
 
     // Fallbacks or retrieved database values
-    const mrp = amazonReport?.mrp || kindleReport?.mrp || playbooksReport?.mrp || selectedBook.price || 299;
-    const printingPrice = amazonReport?.printingCost || 85.00;
+    const mrp = amazonReport?.mrp || kindleReport?.mrp || playbooksReport?.mrp || maybeifyReport?.mrp || selectedBook.price || 299;
+    const printingPrice = amazonReport?.printingCost || maybeifyReport?.printingCost || 85.00;
     const bookCost = mrp;
 
     const amazonSales = amazonReport?.unitsSold || 0;
     const amazonRoyalty = amazonReport?.revenue || 0.0;
 
-    const maybeifySales = 0; // Defaulting to 0 mock Direct sales
-    const maybeifyRoyalty = 0.0;
+    const maybeifySales = maybeifyReport?.unitsSold || 0;
+    const maybeifyRoyalty = maybeifyReport?.revenue || 0.0;
 
     const googleSales = playbooksReport?.unitsSold || 0;
     const googleRoyalty = playbooksReport?.revenue || 0.0;
