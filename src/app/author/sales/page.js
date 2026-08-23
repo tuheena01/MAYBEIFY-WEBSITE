@@ -250,9 +250,25 @@ export default function BookSales() {
       {/* Spreadsheet Presentation Section */}
       {selectedBook ? (
         <div>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             Spreadsheet: <span style={{ color: 'var(--accent)' }}>"{selectedBook.title}"</span>
           </h2>
+
+          <div className="glass" style={{ 
+            padding: '1rem 1.5rem', 
+            borderRadius: '8px', 
+            marginBottom: '2rem', 
+            background: 'rgba(33, 115, 70, 0.05)', 
+            border: '1px dashed rgba(33, 115, 70, 0.3)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.8rem' 
+          }}>
+            <span style={{ fontSize: '1.2rem' }}>💡</span>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: '#ccc' }}>
+              <strong>Amazon Royalty Formula:</strong> <code>Royalty per Unit = Amazon Book Cost - (Printing price + Shipping cost)</code>
+            </p>
+          </div>
 
           <div style={{ overflowX: 'auto', background: '#0b0c10', border: '1px solid #2d303a', borderRadius: '8px' }}>
             <table style={{
