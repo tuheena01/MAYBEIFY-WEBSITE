@@ -100,6 +100,7 @@ export default function BookSales() {
       shippingPrice,
       bookCost,
       amazonSales,
+      amazonRoyaltyUnit,
       amazonRoyalty,
       maybeifySales,
       maybeifyRoyalty,
@@ -122,7 +123,8 @@ export default function BookSales() {
       'Amazon Book cost',
       'Month',
       'Amazon sales',
-      'Royalty earned',
+      'Amazon Royalty (unit)',
+      'Total Amazon Royalty Earned',
       'Month',
       'Maybeify Sales',
       'Maybeify Royalty earned',
@@ -144,6 +146,7 @@ export default function BookSales() {
         row.bookCost.toFixed(2),
         `"${row.month}"`,
         row.amazonSales,
+        row.amazonRoyaltyUnit.toFixed(2),
         row.amazonRoyalty.toFixed(2),
         `"${row.month}"`,
         row.maybeifySales,
@@ -284,8 +287,8 @@ export default function BookSales() {
                 {/* Excel Column Letters row */}
                 <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a' }}>
                   <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}></th>
-                  {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'].map((letter, i) => (
-                    <th key={i} style={{ padding: '0.4rem', borderRight: letter !== 'R' ? '1px solid #2d303a' : 'none', color: '#888' }}>{letter}</th>
+                  {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'].map((letter, i) => (
+                    <th key={i} style={{ padding: '0.4rem', borderRight: letter !== 'S' ? '1px solid #2d303a' : 'none', color: '#888' }}>{letter}</th>
                   ))}
                 </tr>
                 {/* Excel Colored Headers row */}
@@ -298,7 +301,8 @@ export default function BookSales() {
                   {/* Amazon store columns */}
                   <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Month</td>
                   <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon sales</td>
-                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Royalty earned</td>
+                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Royalty (unit)</td>
+                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32', fontWeight: 'bold' }}>Total Amazon Royalty Earned</td>
                   {/* Maybeify columns */}
                   <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Month</td>
                   <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Sales</td>
@@ -322,7 +326,7 @@ export default function BookSales() {
                 {spreadsheetRows.length === 0 ? (
                   <tr>
                     <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                    <td colSpan={18} style={{ padding: '3rem', color: '#666', fontStyle: 'italic' }}>
+                    <td colSpan={19} style={{ padding: '3rem', color: '#666', fontStyle: 'italic' }}>
                       No reports found for this book.
                     </td>
                   </tr>
@@ -339,7 +343,8 @@ export default function BookSales() {
                         {/* Amazon Store */}
                         <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#81c784' }}>{row.month}</td>
                         <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>{row.amazonSales}</td>
-                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#81c784' }}>₹{row.amazonRoyalty.toFixed(2)}</td>
+                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#81c784' }}>₹{row.amazonRoyaltyUnit.toFixed(2)}</td>
+                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#81c784', background: 'rgba(46, 125, 50, 0.04)' }}>₹{row.amazonRoyalty.toFixed(2)}</td>
                         {/* Maybeify direct */}
                         <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#90a4ae' }}>{row.month}</td>
                         <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>{row.maybeifySales}</td>

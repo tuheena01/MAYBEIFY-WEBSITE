@@ -652,7 +652,7 @@ export default function AdminDashboard() {
                   {/* Alphabet excel row */}
                   <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a', textAlign: 'center' }}>
                     <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a' }}></th>
-                    {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'].map((l, i) => (
+                    {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'].map((l, i) => (
                       <th key={i} style={{ padding: '0.3rem', borderRight: '1px solid #2d303a', color: '#888' }}>{l}</th>
                     ))}
                     <th style={{ width: '60px' }}>Actions</th>
@@ -668,6 +668,7 @@ export default function AdminDashboard() {
                     {/* Amazon */}
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Sales</td>
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Amazon Royalty (unit)</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#2e7d32', fontWeight: 'bold' }}>Total Amazon Royalty</td>
                     {/* Maybeify */}
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Sales</td>
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#455a64' }}>Maybeify Royalty (unit)</td>
@@ -686,7 +687,7 @@ export default function AdminDashboard() {
                   {spreadsheetRows.length === 0 ? (
                     <tr>
                       <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                      <td colSpan={16} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                      <td colSpan={17} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
                         No spreadsheet rows. Click "Add Row" to initialize.
                       </td>
                     </tr>
@@ -694,6 +695,7 @@ export default function AdminDashboard() {
                     spreadsheetRows.map((row, idx) => {
                       const rowNum = idx + 2;
                       const calculatedAmzRoyalty = row.bookCost - row.printingPrice - row.shippingCost;
+                      const calculatedAmzTotal = row.amazonSales * calculatedAmzRoyalty;
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid #2d303a' }}>
                           <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold', textAlign: 'center' }}>{rowNum}</td>
@@ -761,6 +763,11 @@ export default function AdminDashboard() {
                           {/* Amazon Royalty per unit (LOCKED FORMULA CELL) */}
                           <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.08)', textAlign: 'center', color: '#81c784', fontWeight: 'bold' }}>
                             ₹{calculatedAmzRoyalty.toFixed(2)}
+                          </td>
+
+                          {/* Total Amazon Royalty (LOCKED FORMULA CELL) */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.12)', textAlign: 'center', color: '#81c784', fontWeight: 'bold' }}>
+                            ₹{calculatedAmzTotal.toFixed(2)}
                           </td>
 
                           {/* Maybeify Sales */}
