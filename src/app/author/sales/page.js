@@ -75,10 +75,13 @@ export default function BookSales() {
     // Fallbacks or retrieved database values
     const mrp = amazonReport?.mrp || kindleReport?.mrp || playbooksReport?.mrp || maybeifyReport?.mrp || selectedBook.price || 299;
     const printingPrice = amazonReport?.printingCost || maybeifyReport?.printingCost || 85.00;
+    const shippingPrice = amazonReport?.shippingCost || 40.00;
     const bookCost = mrp;
 
     const amazonSales = amazonReport?.unitsSold || 0;
-    const amazonRoyalty = amazonReport?.revenue || 0.0;
+    // Amazon Royalty Formula: Book Cost - Printing Price - Shipping Cost
+    const amazonRoyaltyUnit = bookCost - printingPrice - shippingPrice;
+    const amazonRoyalty = amazonSales * amazonRoyaltyUnit;
 
     const maybeifySales = maybeifyReport?.unitsSold || 0;
     const maybeifyRoyalty = maybeifyReport?.revenue || 0.0;
@@ -94,6 +97,7 @@ export default function BookSales() {
     return {
       month: m,
       printingPrice,
+      shippingPrice,
       bookCost,
       amazonSales,
       amazonRoyalty,
@@ -114,6 +118,7 @@ export default function BookSales() {
     // Headers
     const headers = [
       'Printing price',
+      'Shipping price',
       'Amazon Book cost',
       'Month',
       'Amazon sales',
@@ -135,6 +140,7 @@ export default function BookSales() {
     spreadsheetRows.forEach(row => {
       const dataRow = [
         row.printingPrice.toFixed(2),
+        row.shippingPrice.toFixed(2),
         row.bookCost.toFixed(2),
         `"${row.month}"`,
         row.amazonSales,
@@ -262,8 +268,8 @@ export default function BookSales() {
                 {/* Excel Column Letters row */}
                 <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a' }}>
                   <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}></th>
-                  {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'].map((letter, i) => (
-                    <th key={i} style={{ padding: '0.4rem', borderRight: letter !== 'Q' ? '1px solid #2d303a' : 'none', color: '#888' }}>{letter}</th>
+                  {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'].map((letter, i) => (
+                    <th key={i} style={{ padding: '0.4rem', borderRight: letter !== 'R' ? '1px solid #2d303a' : 'none', color: '#888' }}>{letter}</th>
                   ))}
                 </tr>
                 {/* Excel Colored Headers row */}
@@ -271,6 +277,7 @@ export default function BookSales() {
                   <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>1</td>
                   {/* General cost columns */}
                   <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#d4af37', color: 'black' }}>Printing price</td>
+                  <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#80cbc4', color: 'black' }}>Shipping cost</td>
                   <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#e28743', color: 'black' }}>Amazon Book cost</td>
                   {/* Amazon store columns */}
                   <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', background: '#2e7d32' }}>Month</td>
@@ -299,7 +306,7 @@ export default function BookSales() {
                 {spreadsheetRows.length === 0 ? (
                   <tr>
                     <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                    <td colSpan={16} style={{ padding: '3rem', color: '#666', fontStyle: 'italic' }}>
+                    <td colSpan={18} style={{ padding: '3rem', color: '#666', fontStyle: 'italic' }}>
                       No reports found for this book.
                     </td>
                   </tr>
@@ -311,6 +318,7 @@ export default function BookSales() {
                         <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold' }}>{rowNum}</td>
                         {/* Costs */}
                         <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold' }}>₹{row.printingPrice.toFixed(2)}</td>
+                        <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', fontWeight: 'bold', color: '#80cbc4' }}>₹{row.shippingPrice.toFixed(2)}</td>
                         <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a' }}>₹{row.bookCost.toFixed(2)}</td>
                         {/* Amazon Store */}
                         <td style={{ padding: '0.8rem', borderRight: '1px solid #2d303a', color: '#81c784' }}>{row.month}</td>

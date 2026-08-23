@@ -116,14 +116,16 @@ export default function AdminDashboard() {
 
           const mrp = amz?.mrp || kdl?.mrp || pb?.mrp || mbf?.mrp || book.price || 299;
           const printingPrice = amz?.printingCost || mbf?.printingCost || 85.00;
+          const shippingCost = amz?.shippingCost || 40.00;
 
           return {
             month: monthName,
             year: yearVal,
             printingPrice,
+            shippingCost,
             bookCost: mrp,
             amazonSales: amz?.unitsSold || 0,
-            amazonRoyaltyPerUnit: amz?.royaltyPerUnit || 60.00,
+            amazonRoyaltyPerUnit: amz?.royaltyPerUnit || (mrp - printingPrice - shippingCost),
             maybeifySales: mbf?.unitsSold || 0,
             maybeifyRoyaltyPerUnit: mbf?.royaltyPerUnit || 0.0,
             googleSales: pb?.unitsSold || 0,
@@ -218,9 +220,10 @@ export default function AdminDashboard() {
       month: 'September',
       year: 2026,
       printingPrice: 85.0,
+      shippingCost: 40.0,
       bookCost: 299.0,
       amazonSales: 0,
-      amazonRoyaltyPerUnit: 60.0,
+      amazonRoyaltyPerUnit: 174.0, // calculated from bookCost - printingPrice - shippingCost
       maybeifySales: 0,
       maybeifyRoyaltyPerUnit: 0.0,
       googleSales: 0,
@@ -252,17 +255,23 @@ export default function AdminDashboard() {
     // Compile horizontal rows to platform reports list
     const reportsList = [];
     spreadsheetRows.forEach(row => {
+      const pPrice = parseFloat(row.printingPrice) || 0.0;
+      const sCost = parseFloat(row.shippingCost) || 0.0;
+      const bCost = parseFloat(row.bookCost) || 0.0;
+      const amzSales = parseInt(row.amazonSales) || 0;
+      const amzRoyaltyPerUnit = bCost - pPrice - sCost;
+
       // Amazon
       reportsList.push({
         platform: 'AMAZON',
         month: row.month,
         year: parseInt(row.year) || 2026,
-        mrp: parseFloat(row.bookCost) || 0.0,
-        printingCost: parseFloat(row.printingPrice) || 0.0,
-        shippingCost: 40.00,
-        royaltyPerUnit: parseFloat(row.amazonRoyaltyPerUnit) || 0.0,
-        unitsSold: parseInt(row.amazonSales) || 0,
-        revenue: (parseInt(row.amazonSales) || 0) * (parseFloat(row.amazonRoyaltyPerUnit) || 0.0),
+        mrp: bCost,
+        printingCost: pPrice,
+        shippingCost: sCost,
+        royaltyPerUnit: amzRoyaltyPerUnit,
+        unitsSold: amzSales,
+        revenue: amzSales * amzRoyaltyPerUnit,
         screenshot: row.screenshot || null
       });
       // Maybeify
@@ -643,7 +652,7 @@ export default function AdminDashboard() {
                   {/* Alphabet excel row */}
                   <tr style={{ background: '#1c1e24', borderBottom: '1px solid #2d303a', textAlign: 'center' }}>
                     <th style={{ width: '40px', background: '#14161b', borderRight: '1px solid #2d303a' }}></th>
-                    {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'].map((l, i) => (
+                    {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'].map((l, i) => (
                       <th key={i} style={{ padding: '0.3rem', borderRight: '1px solid #2d303a', color: '#888' }}>{l}</th>
                     ))}
                     <th style={{ width: '60px' }}>Actions</th>
@@ -652,6 +661,7 @@ export default function AdminDashboard() {
                   <tr style={{ borderBottom: '1px solid #2d303a', fontWeight: 'bold', textAlign: 'center', color: 'white' }}>
                     <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>1</td>
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#d4af37', color: 'black' }}>Printing price</td>
+                    <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#80cbc4', color: 'black' }}>Shipping cost</td>
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#e28743', color: 'black' }}>Book cost</td>
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Month</td>
                     <td style={{ padding: '0.5rem', borderRight: '1px solid #2d303a', background: '#14161b' }}>Year</td>
@@ -676,13 +686,14 @@ export default function AdminDashboard() {
                   {spreadsheetRows.length === 0 ? (
                     <tr>
                       <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888' }}>2</td>
-                      <td colSpan={14} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                      <td colSpan={16} style={{ padding: '2rem', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
                         No spreadsheet rows. Click "Add Row" to initialize.
                       </td>
                     </tr>
                   ) : (
                     spreadsheetRows.map((row, idx) => {
                       const rowNum = idx + 2;
+                      const calculatedAmzRoyalty = row.bookCost - row.printingPrice - row.shippingCost;
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid #2d303a' }}>
                           <td style={{ background: '#14161b', borderRight: '1px solid #2d303a', color: '#888', fontWeight: 'bold', textAlign: 'center' }}>{rowNum}</td>
@@ -694,6 +705,16 @@ export default function AdminDashboard() {
                               value={row.printingPrice} 
                               onChange={(e) => handleCellChange(idx, 'printingPrice', parseFloat(e.target.value) || 0.0)} 
                               style={{ width: '80px', border: 'none', background: 'transparent', color: 'white', textAlign: 'center', outline: 'none' }}
+                            />
+                          </td>
+
+                          {/* Shipping cost */}
+                          <td style={{ borderRight: '1px solid #2d303a' }}>
+                            <input 
+                              type="number" 
+                              value={row.shippingCost} 
+                              onChange={(e) => handleCellChange(idx, 'shippingCost', parseFloat(e.target.value) || 0.0)} 
+                              style={{ width: '80px', border: 'none', background: 'transparent', color: '#80cbc4', fontWeight: 'bold', textAlign: 'center', outline: 'none' }}
                             />
                           </td>
 
@@ -737,14 +758,9 @@ export default function AdminDashboard() {
                             />
                           </td>
 
-                          {/* Amazon Royalty per unit */}
-                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.03)' }}>
-                            <input 
-                              type="number" 
-                              value={row.amazonRoyaltyPerUnit} 
-                              onChange={(e) => handleCellChange(idx, 'amazonRoyaltyPerUnit', parseFloat(e.target.value) || 0.0)} 
-                              style={{ width: '70px', border: 'none', background: 'transparent', color: '#81c784', textAlign: 'center', outline: 'none' }}
-                            />
+                          {/* Amazon Royalty per unit (LOCKED FORMULA CELL) */}
+                          <td style={{ borderRight: '1px solid #2d303a', background: 'rgba(46, 125, 50, 0.08)', textAlign: 'center', color: '#81c784', fontWeight: 'bold' }}>
+                            ₹{calculatedAmzRoyalty.toFixed(2)}
                           </td>
 
                           {/* Maybeify Sales */}
