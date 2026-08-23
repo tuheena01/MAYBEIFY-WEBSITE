@@ -197,36 +197,129 @@ async function main() {
       screenshot: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800'
     }
   });
-  await prisma.salesPlatformReport.create({
-    data: {
-      bookId: book2.id,
-      platform: 'AMAZON',
-      month: 'August 2026',
-      year: 2026,
-      mrp: 399.00,
-      printingCost: 110.00,
-      shippingCost: 40.00,
-      royaltyPerUnit: 80.00,
-      unitsSold: 25,
-      revenue: 25 * 80.00,
-      screenshot: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800'
-    }
-  });
-  await prisma.salesPlatformReport.create({
-    data: {
-      bookId: book2.id,
-      platform: 'PLAYBOOKS',
-      month: 'August 2026',
-      year: 2026,
-      mrp: 199.00,
-      printingCost: 0.0,
-      shippingCost: 0.0,
-      royaltyPerUnit: 55.00,
-      unitsSold: 42,
-      revenue: 42 * 55.00,
-      screenshot: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800'
-    }
-  });
+   // Book 2 - Beyond Blessed July reports
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'AMAZON',
+       month: 'June-July',
+       year: 2026,
+       mrp: 300.00,
+       printingCost: 208.00,
+       shippingCost: 33.00,
+       royaltyPerUnit: 59.00,
+       unitsSold: 12,
+       revenue: 12 * 59.00,
+       screenshot: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800'
+     }
+   });
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'MAYBEIFY',
+       month: 'June-July',
+       year: 2026,
+       mrp: 300.00,
+       printingCost: 208.00,
+       shippingCost: 33.00,
+       royaltyPerUnit: 59.00,
+       unitsSold: 2,
+       revenue: 2 * 59.00,
+       screenshot: 'https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=800'
+     }
+   });
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'KINDLE',
+       month: 'June-July',
+       year: 2026,
+       mrp: 149.00,
+       printingCost: 0.00,
+       shippingCost: 0.00,
+       royaltyPerUnit: 45.00,
+       unitsSold: 28,
+       revenue: 28 * 45.00,
+       screenshot: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800'
+     }
+   });
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'PLAYBOOKS',
+       month: 'June-July',
+       year: 2026,
+       mrp: 199.00,
+       printingCost: 0.00,
+       shippingCost: 0.00,
+       royaltyPerUnit: 55.00,
+       unitsSold: 15,
+       revenue: 15 * 55.00,
+       screenshot: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800'
+     }
+   });
+
+   // Book 2 - Beyond Blessed August reports
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'AMAZON',
+       month: 'July-August',
+       year: 2026,
+       mrp: 330.00,
+       printingCost: 208.00,
+       shippingCost: 33.00,
+       royaltyPerUnit: 89.00,
+       unitsSold: 2,
+       revenue: 2 * 89.00,
+       screenshot: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800'
+     }
+   });
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'MAYBEIFY',
+       month: 'July-August',
+       year: 2026,
+       mrp: 330.00,
+       printingCost: 208.00,
+       shippingCost: 33.00,
+       royaltyPerUnit: 89.00,
+       unitsSold: 6,
+       revenue: 6 * 89.00,
+       screenshot: 'https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=800'
+     }
+   });
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'KINDLE',
+       month: 'July-August',
+       year: 2026,
+       mrp: 149.00,
+       printingCost: 0.00,
+       shippingCost: 0.00,
+       royaltyPerUnit: 45.00,
+       unitsSold: 35,
+       revenue: 35 * 45.00,
+       screenshot: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800'
+     }
+   });
+   await prisma.salesPlatformReport.create({
+     data: {
+       bookId: book2.id,
+       platform: 'PLAYBOOKS',
+       month: 'July-August',
+       year: 2026,
+       mrp: 199.00,
+       printingCost: 0.00,
+       shippingCost: 0.00,
+       royaltyPerUnit: 55.00,
+       unitsSold: 22,
+       revenue: 22 * 55.00,
+       screenshot: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800'
+     }
+   });
 
   // Seed Punit's Royalties
   console.log('Seeding royalties...');
