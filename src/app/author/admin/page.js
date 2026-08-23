@@ -75,8 +75,6 @@ export default function AdminDashboard() {
           awards: author.awards || '',
           publications: author.publications || ''
         });
-        setSelectedBookId('');
-        setSpreadsheetRows([]);
       }
     } else {
       setProfileForm({
@@ -89,10 +87,14 @@ export default function AdminDashboard() {
         awards: '',
         publications: ''
       });
-      setSelectedBookId('');
-      setSpreadsheetRows([]);
     }
   }, [selectedAuthorId, authors]);
+
+  // Reset selected book only when selectedAuthorId actually changes
+  useEffect(() => {
+    setSelectedBookId('');
+    setSpreadsheetRows([]);
+  }, [selectedAuthorId]);
 
   // Load spreadsheet rows when book changes
   useEffect(() => {
