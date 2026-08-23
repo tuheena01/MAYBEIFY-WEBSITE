@@ -14,7 +14,14 @@ export default function BookSales() {
   useEffect(() => {
     fetch('/api/author/sales')
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch sales reports');
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 404) {
+            document.cookie = 'token=; Max-Age=0; path=/';
+            window.location.href = '/author/login';
+            return;
+          }
+          throw new Error('Failed to fetch sales reports');
+        }
         return res.json();
       })
       .then((resData) => {

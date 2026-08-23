@@ -21,7 +21,14 @@ export default function AuthorEarnings() {
   const fetchEarnings = () => {
     fetch('/api/author/earnings')
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to load earnings details');
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 404) {
+            document.cookie = 'token=; Max-Age=0; path=/';
+            window.location.href = '/author/login';
+            return;
+          }
+          throw new Error('Failed to load earnings details');
+        }
         return res.json();
       })
       .then((resData) => {
