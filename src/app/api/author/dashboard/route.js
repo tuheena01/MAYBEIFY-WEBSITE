@@ -72,9 +72,8 @@ export async function GET(req) {
       where: { authorId: payload.userId }
     });
     
-    // Total earnings from sales + non-royalty paid payouts (e.g. referrals)
-    const nonRoyaltyPaid = transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
-    const totalEarnings = totalSalesRevenue + nonRoyaltyPaid;
+    // Total earnings strictly from sales reports addition
+    const totalEarnings = totalSalesRevenue;
 
     // 6. Recent Activity
     const activities = [];

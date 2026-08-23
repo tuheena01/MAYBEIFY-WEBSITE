@@ -54,9 +54,7 @@ export async function GET(req) {
 
     // Calculate payouts
     const paidAmount = withdrawals.filter(w => w.status === 'APPROVED').reduce((sum, w) => sum + w.amount, 0);
-    const nonRoyaltyPaid = transactions.filter(t => t.status === 'PAID' && t.type !== 'ROYALTY').reduce((sum, t) => sum + t.amount, 0);
-    
-    const totalEarnings = totalSalesRevenue + nonRoyaltyPaid;
+    const totalEarnings = totalSalesRevenue;
     const pendingEarnings = Math.max(0, totalEarnings - paidAmount);
     const thisMonthEarnings = thisMonthRevenue;
 
