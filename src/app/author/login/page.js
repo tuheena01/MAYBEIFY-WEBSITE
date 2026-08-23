@@ -29,8 +29,11 @@ export default function AuthorLogin() {
 
       if (res.ok) {
         setStatus({ type: 'success', message: 'Login successful. Redirecting...' });
-        // Assuming setting a cookie or local storage, then redirect
-        window.location.href = '/author/dashboard';
+        if (resData.role === 'ADMIN') {
+          window.location.href = '/author/admin';
+        } else {
+          window.location.href = '/author/dashboard';
+        }
       } else {
         setStatus({ type: 'error', message: resData.error || 'Invalid credentials.' });
       }

@@ -59,7 +59,7 @@ export async function POST(req) {
       path: '/',
     });
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, role: user.role }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
